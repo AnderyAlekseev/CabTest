@@ -1,0 +1,2 @@
+stm32f1xx_ll_bus.h:269:22:LL_AHB1_GRP1_EnableClock	24	static
+crc.c:28:6:MX_CRC_Init	8	static

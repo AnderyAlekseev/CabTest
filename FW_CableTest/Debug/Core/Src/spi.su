@@ -1,0 +1,7 @@
+stm32f1xx_ll_bus.h:763:22:LL_APB2_GRP1_EnableClock	24	static
+stm32f1xx_ll_spi.h:697:26:LL_SPI_IsActiveFlag_RXNE	16	static
+stm32f1xx_ll_spi.h:708:26:LL_SPI_IsActiveFlag_TXE	16	static
+stm32f1xx_ll_spi.h:1031:25:LL_SPI_ReceiveData8	16	static
+stm32f1xx_ll_spi.h:1054:22:LL_SPI_TransmitData8	24	static
+spi.c:28:6:MX_SPI1_Init	72	static
+spi.c:68:9:LL_SPI_TransmitReceive	16	static

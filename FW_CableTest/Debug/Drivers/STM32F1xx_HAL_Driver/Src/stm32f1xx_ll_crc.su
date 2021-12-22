@@ -1,0 +1,3 @@
+stm32f1xx_ll_crc.h:108:22:LL_CRC_ResetCRCCalculationUnit	16	static
+stm32f1xx_ll_crc.h:164:22:LL_CRC_Write_IDR	16	static
+stm32f1xx_ll_crc.c:63:13:LL_CRC_DeInit	24	static
