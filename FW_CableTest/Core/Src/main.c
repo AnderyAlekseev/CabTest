@@ -76,6 +76,7 @@ int main(void)
 	char status[20] = "123456";
 	Env.Menu.ActiveItem=0;
 	Env.Menu.ActivePage=0;
+	Env.Mode = MENU;
 	Env.Menu.BGR_Color = COLOR565_DARK_BLUE;	// background
 	Env.Menu.TXT_Color	= COLOR565_ALICE_BLUE;	// текст
 	Env.Menu.SEL_Color	= COLOR565_BLUE;		// выделение
@@ -83,6 +84,7 @@ int main(void)
 	Env.Menu.DANGER_TXT_Color	=COLOR565_WHITE;
 	Env.Menu.DANGER_BGR_Color	=COLOR565_RED;
 
+	uint8_t mode = Env.Mode;
 	f_RefreshScreen = 1;
   /* USER CODE END 1 */
 
@@ -157,13 +159,20 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	ST7735_Clear(Env.Menu.BGR_Color);
+	ST7735_Clear(BGR_COLOR);
 	FS_GetFileList( &Env);
 	Env.Menu.NmbrAllPages = (uint32_t)(Env.Menu.NmbrAllFiles/ITEM_ON_PAGE_MAX);
   while (1)
   {
-	Menu(&Env);
-	Test(&Env);
+	ReadKeyPad();
+	switch(mode)	// назначить действие в зависимости от текущего режима
+			{
+				case MENU: 			Menu(&Env); 		break;
+				case CHECK_SCHEME: 	ChekSchem(&Env);  	break;
+				case TEST: 			Test(&Env);			break;
+				case RESULT: 		Result(&Env);		break;
+					default: break;
+			}
 	Display(&Env);
 
 	  //HAL_Delay(200);

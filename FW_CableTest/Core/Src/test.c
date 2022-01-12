@@ -6,7 +6,3 @@
  */
 #include "main.h"
 
-void Test(typeEnv *Env)
-{
-
-}

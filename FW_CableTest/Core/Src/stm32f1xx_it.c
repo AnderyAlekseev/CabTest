@@ -231,7 +231,7 @@ void Flags_1ms(void)
 void Flags_10msec()
 {
 	f_10ms = 1;		// user flag every 10 ms
-	f_EncoderRead=1;
+	f_ReadKeyPad=1;
 	  if (--t_100ms == 0x00)
 		{
 		  t_100ms = cl_ms100;

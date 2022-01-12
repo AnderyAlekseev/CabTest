@@ -49,6 +49,8 @@ extern "C" {
 #include "font7x11.h"
 #include "color565.h"
 #include "ff.h"
+
+
 #define FILENAME_SIZE 		(uint8_t)13  								// максимальная длина имени файла для списка
 #define DATA_TEST_SIZE  	(uint8_t)255								// длина строки с данными из файла
 #define ITEM_ON_PAGE_MAX 	(uint8_t)9	//11									// максимальное количество строк на странице меню
@@ -69,10 +71,21 @@ extern "C" {
 #define    DANGER_TXT_COLOR	COLOR565_WHITE//
 #define    DANGER_BGR_COLOR	COLOR565_RED//
 
+/*	 режимы работы (состояния прибора)*/
+#define MENU			1	// отображение и навигация по меню
+#define CHECK_SCHEME	2	// отображение схемы проверки из файла перед запуском теста
+#define TEST			3	// тест - НЕ ПРЕДУСМОТРЕН ОТКЛИК НА КЛАВИАТУРУ
+#define RESULT			4	//
+/* коды нажатия кнопок*/
+#define UP		0x0B
+#define DOWN	0x0E
+#define OK		0x0D
+#define ENC_BUT	0x07
+
 /* ПАРАМЕТРЫ ЧТЕН�?Я Д�?РЕКТОР�?�? SD карты
  * используется в  FS_GetFileList()*/
-#define FS_ALL_DIR		1		// читать все файлы, чтобы узнать количество всех файлов
-#define FS_ONE_PAGE		2		// читать только для одной страницы меню, чтобы заполнить список названиями файлов
+//#define FS_ALL_DIR		1		// читать все файлы, чтобы узнать количество всех файлов
+//#define FS_ONE_PAGE		2		// читать только для одной страницы меню, чтобы заполнить список названиями файлов
 
 /* USER CODE END Includes */
 
@@ -100,6 +113,7 @@ typedef struct {
 	typeMenu Menu;
 	char Status;
 	char *FileNameForTest;
+	uint8_t Mode;
 	uint32_t DataForTest[2][32];
 	uint8_t RealDataSize;
 }typeEnv;
@@ -122,7 +136,7 @@ typedef struct {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-
+void ReadKeyPad(void);
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
@@ -174,9 +188,12 @@ extern  uint32_t FLAG;
 #define f_1sec		        BBAdr(FLAG,3)
 #define f_1min              BBAdr(FLAG,4)
 #define f_RefreshScreen     BBAdr(FLAG,5)
-#define f_EncoderRead       BBAdr(FLAG,6)
-#define f_ButtRead			BBAdr(FLAG,7)
-
+#define f_ReadKeyPad        BBAdr(FLAG,6)
+//#define f_ButtRead			BBAdr(FLAG,7)
+#define f_StepMenu			BBAdr(FLAG,8)
+#define f_DirStepMenu		BBAdr(FLAG,9)
+#define f_Action			BBAdr(FLAG,10)
+#define f_StartTest			BBAdr(FLAG,11)
 
 
 /* USER CODE END Private defines */

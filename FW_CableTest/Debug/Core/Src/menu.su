@@ -1,5 +1,12 @@
 stm32f1xx_ll_tim.h:1259:26:LL_TIM_GetCounter	16	static
 stm32f1xx_ll_gpio.h:723:26:LL_GPIO_IsInputPinSet	16	static
-menu.c:15:6:Menu	56	static
-menu.c:99:6:Keyboard_handler	32	static
-menu.c:106:6:ParseString	24	static
+menu.c:20:6:Menu	24	static
+menu.c:70:6:ChekSchem	16	static
+menu.c:91:6:Test	16	static
+menu.c:114:6:Result	16	static
+menu.c:129:6:ReadKeyPad	16	static
+menu.c:166:6:StepUP	4	static
+menu.c:171:6:StepDOWN	4	static
+menu.c:176:6:Keyboard_handler	16	static
+menu.c:191:6:Encoder_handler	16	static
+menu.c:205:6:ParseString	24	static
