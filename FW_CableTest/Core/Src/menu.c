@@ -20,7 +20,8 @@ void Menu(typeEnv *Env)
 	short int ActiveItem = (*Env).Menu.ActiveItem;
 	short int ActivePage = (*Env).Menu.ActivePage;
 	char *fileName = (*Env).FileNameForTest;
-	static uint8_t but_latch=0, but_press=0, indx=0;
+	static uint8_t but_latch=0, but_press=0, indx=0, key=0;
+	uint8_t but_OK=0, but_DWN=0, but_UP=0, but_ENC=0;
 
 	char String[FILENAME_SIZE];
 
@@ -63,8 +64,23 @@ void Menu(typeEnv *Env)
 			}
 
 					/* обработка кнопки */
-					but_latch = LL_GPIO_IsInputPinSet(BUTTON_GPIO_Port, BUTTON_Pin);
-					if( but_latch == 0 )
+		but_ENC = LL_GPIO_IsInputPinSet(BUTTON_GPIO_Port, BUTTON_Pin)<<3;
+		but_UP  = LL_GPIO_IsInputPinSet(BUT_UP_GPIO_Port, BUT_UP_Pin)<<2;
+		but_OK  = LL_GPIO_IsInputPinSet(BUT_OK_GPIO_Port, BUT_OK_Pin)<<1;
+		but_DWN = LL_GPIO_IsInputPinSet(BUT_DWN_GPIO_Port,BUT_DWN_Pin);
+		but_latch = but_ENC | but_UP | but_OK | but_DWN;
+		if(but_latch !=0xF)
+		{
+			but_press=1;
+			key = but_latch;
+		}
+		if( but_latch==0xF &&  but_press ==1)
+		{
+			but_press=0;
+			Keyboard_handler(Env, key);
+			key=0;
+		}
+				/*	if( but_latch == 0 )
 					{
 						but_press=1;
 					}
@@ -73,21 +89,19 @@ void Menu(typeEnv *Env)
 						but_press=0;
 						(*Env).FileNameForTest = &(*Env).Menu.FileList[ActiveItem][0];// указателю отдаем адрес
 						FS_ReadFile(Env);
-
-						//ParseString(&String, (*Env).DataForTest);
-
-						//strncpy(&String, ((*Env).FileNameForTest), FILENAME_SIZE);
-						//sprintf(&String,"COLORS565[%d] ", indx);
-						//ST7735_DrawString7x11(1,15,String,COLORS565[indx++],COLORS565[indx]);
-						static uint8_t step=0;
-						ST7735_DrawChar(1,0,'A',(*Env).Menu.TXT_Color,(*Env).Menu.BGR_Color);
-						ST7735_DrawChar(11,0, step++,(*Env).Menu.TXT_Color,(*Env).Menu.BGR_Color);
-					}
-
+					}*/
+//
+//		ST7735_DrawChar7x11(110,92, String,TXT_COLOR,BGR_COLOR);
 	}
 
 }
 
+void Keyboard_handler(typeEnv *Env, uint8_t key)
+{
+	char String[8]={0};
+	sprintf(&String, "%X", key);
+	ST7735_DrawString7x11(100,92,String,TXT_COLOR,BGR_COLOR);
+}
 
 void ParseString(char  *str_in, char *data_out)
 {

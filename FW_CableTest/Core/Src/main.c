@@ -55,7 +55,6 @@ uint32_t FLAG;
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
-uint8_t FS_GetFileList(typeEnv *Env);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -74,13 +73,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	FATFS	FatFs; 	//Fatfs handle
-	//FIL		fil; 		//File handle
-	//FRESULT fres=2;   //Result after operations
-	//uint16_t cntTIM3=0;
-	//uint32_t DirCount=0;
-	//char EncoderString[6] = "Привет";
 	char status[20] = "123456";
-	//uint8_t tick=0;
 	Env.Menu.ActiveItem=0;
 	Env.Menu.ActivePage=0;
 	Env.Menu.BGR_Color = COLOR565_DARK_BLUE;	// background
@@ -89,7 +82,6 @@ int main(void)
 	Env.Menu.BRD_Color	= COLOR565_ALICE_BLUE;	// border
 	Env.Menu.DANGER_TXT_Color	=COLOR565_WHITE;
 	Env.Menu.DANGER_BGR_Color	=COLOR565_RED;
-
 
 	f_RefreshScreen = 1;
   /* USER CODE END 1 */
@@ -110,12 +102,14 @@ int main(void)
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
-	MX_GPIO_Init();
-	MX_CRC_Init();
-	MX_SPI1_Init();
-	LL_SPI_Enable(SPI1);// включить SPI после инициализации
-	MX_FATFS_Init();
-	MX_TIM3_Init();
+  MX_GPIO_Init();
+  MX_CRC_Init();
+  MX_SPI1_Init();
+  LL_SPI_Enable(SPI1);// включить SPI после инициализации
+  MX_FATFS_Init();
+  MX_TIM3_Init();
+  MX_TIM1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
 	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_4, LL_GPIO_MODE_INPUT);
 	LL_GPIO_SetPinPull(GPIOB, LL_GPIO_PIN_4, LL_GPIO_PULL_UP);
@@ -174,7 +168,7 @@ int main(void)
 
 	  //HAL_Delay(200);
 
-	/* USER CODE END WHILE */
+    /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
   }

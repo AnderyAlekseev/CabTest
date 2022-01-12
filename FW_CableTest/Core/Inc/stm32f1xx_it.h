@@ -56,8 +56,6 @@ void SVC_Handler(void);
 void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
-
-
 /* USER CODE BEGIN EFP */
 extern void timer_1ms(void);
 extern void Flags_1ms(void);

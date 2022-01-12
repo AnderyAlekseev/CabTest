@@ -253,7 +253,6 @@ void Flags_100ms(void)
 void Flags_1s(void)
 {
 	f_1sec = 1;		// user flag every 1 sec
-	LL_GPIO_TogglePin(GPIOB, LL_GPIO_PIN_0);
 	if (--t_min == 0x00)
 			{
 				f_1min = 1;

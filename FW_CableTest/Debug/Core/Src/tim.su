@@ -8,4 +8,11 @@ stm32f1xx_ll_tim.h:2323:22:LL_TIM_IC_SetPolarity	32	static
 stm32f1xx_ll_tim.h:2530:22:LL_TIM_SetEncoderMode	16	static
 stm32f1xx_ll_tim.h:2559:22:LL_TIM_SetTriggerOutput	16	static
 stm32f1xx_ll_tim.h:2625:22:LL_TIM_DisableMasterSlaveMode	16	static
-tim.c:28:6:MX_TIM3_Init	48	static
+tim.c:31:6:MX_TIM1_Init	80	static
+tim.c:79:6:MX_TIM2_Init	32	static
+tim.c:111:6:MX_TIM3_Init	48	static
+tim.c:149:6:HAL_TIM_PWM_MspInit	24	static
+tim.c:165:6:HAL_TIM_IC_MspInit	40	static
+tim.c:191:6:HAL_TIM_MspPostInit	40	static
+tim.c:217:6:HAL_TIM_PWM_MspDeInit	16	static
+tim.c:233:6:HAL_TIM_IC_MspDeInit	16	static

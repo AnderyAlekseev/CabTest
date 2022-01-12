@@ -38,11 +38,11 @@
 //#define FCLK_SLOW() { MODIFY_REG(SD_SPI_HANDLE.Instance->CR1, SPI_BAUDRATEPRESCALER_256, SPI_BAUDRATEPRESCALER_128); }	/* Set SCLK = slow, approx 280 KBits/s*/
 //#define FCLK_FAST() { MODIFY_REG(SD_SPI_HANDLE.Instance->CR1, SPI_BAUDRATEPRESCALER_256, SPI_BAUDRATEPRESCALER_8); }	/* Set SCLK = fast, approx 4.5 MBits/s */
 #define FCLK_SLOW() {	LL_SPI_SetBaudRatePrescaler(SPI1, LL_SPI_BAUDRATEPRESCALER_DIV128); }	/* Set SCLK = slow, approx 280 KBits/s*/
-#define FCLK_FAST() { 	LL_SPI_SetBaudRatePrescaler(SPI1, LL_SPI_BAUDRATEPRESCALER_DIV4);}	/* Set SCLK = fast, approx 4.5 MBits/s */
+#define FCLK_FAST() { 	LL_SPI_SetBaudRatePrescaler(SPI1, LL_SPI_BAUDRATEPRESCALER_DIV16);}	/* Set SCLK = fast, approx 4.5 MBits/s */
 
 
-#define CS_HIGH()	{ LL_GPIO_SetOutputPin(GPIOB, LL_GPIO_PIN_10);}
-#define CS_LOW()	{ LL_GPIO_ResetOutputPin(GPIOB, LL_GPIO_PIN_10);}
+#define CS_HIGH()	{ LL_GPIO_SetOutputPin(SD_CS_GPIO_Port, SD_CS_Pin);}
+#define CS_LOW()	{ LL_GPIO_ResetOutputPin(SD_CS_GPIO_Port, SD_CS_Pin);}
 
 /*--------------------------------------------------------------------------
    Module Private Functions

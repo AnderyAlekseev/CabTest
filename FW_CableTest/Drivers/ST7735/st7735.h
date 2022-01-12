@@ -17,7 +17,7 @@
 //Defines
 #define LCD_SPI SPI1
 // orientation
-#define VERTICAL //HORIZ // или VERTICAL
+#define HORIZ //HORIZ // или VERTICAL
 #ifdef VERTICAL
 #define WIDTH  127
 #define HEIGHT 159

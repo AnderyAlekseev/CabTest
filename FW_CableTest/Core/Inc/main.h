@@ -50,8 +50,8 @@ extern "C" {
 #include "color565.h"
 #include "ff.h"
 #define FILENAME_SIZE 		(uint8_t)13  								// максимальная длина имени файла для списка
-#define DATA_TEST_SIZE  	(uint8_t)256								// длина строки с данными из файла
-#define ITEM_ON_PAGE_MAX 	(uint8_t)11									// максимальное количество строк на странице меню
+#define DATA_TEST_SIZE  	(uint8_t)255								// длина строки с данными из файла
+#define ITEM_ON_PAGE_MAX 	(uint8_t)9	//11									// максимальное количество строк на странице меню
 #define PAGE_MAX			(uint8_t)(FILELIST_MAX/ITEM_ON_PAGE_MAX)	// максимальное количество страниц меню
 
 /* для парсинга данных из файла
@@ -69,7 +69,7 @@ extern "C" {
 #define    DANGER_TXT_COLOR	COLOR565_WHITE//
 #define    DANGER_BGR_COLOR	COLOR565_RED//
 
-/* ПАРАМЕТРЫ ЧТЕНИЯ ДИРЕКТОРИИ SD карты
+/* ПАРАМЕТРЫ ЧТЕН�?Я Д�?РЕКТОР�?�? SD карты
  * используется в  FS_GetFileList()*/
 #define FS_ALL_DIR		1		// читать все файлы, чтобы узнать количество всех файлов
 #define FS_ONE_PAGE		2		// читать только для одной страницы меню, чтобы заполнить список названиями файлов
@@ -80,20 +80,18 @@ extern "C" {
 /* USER CODE BEGIN ET */
 typedef struct typeMenu{
 	char		FileList[ITEM_ON_PAGE_MAX][FILENAME_SIZE];
+	char	 	ActiveFileNane;
+	short int	ActivePage;
+	short int 	ActiveItem;
 	uint32_t 	NmbrOnPageFiles;
 	uint32_t 	NmbrAllFiles;
 	uint32_t 	NmbrAllPages;
-	short int	ActivePage;
-	short int 	ActiveItem;
-	char	 	ActiveFileNane;
 	uint16_t	BGR_Color;	// фон
 	uint16_t	TXT_Color;	// текст
 	uint16_t	BRD_Color;	// бордер
 	uint16_t	SEL_Color;	// выделение
 	uint16_t	DANGER_TXT_Color;	//
 	uint16_t	DANGER_BGR_Color;	//
-		//uint32_t 	Step;		// 1 - перемещаемся на один шаг по меню
-	//uint32_t 	DirStep;	// 1 - вниз; 0 - вверх
 
 }typeMenu;
 
@@ -102,7 +100,7 @@ typedef struct {
 	typeMenu Menu;
 	char Status;
 	char *FileNameForTest;
-	char DataForTest[DATA_TEST_SIZE];
+	uint32_t DataForTest[2][32];
 	uint8_t RealDataSize;
 }typeEnv;
 
@@ -124,9 +122,7 @@ typedef struct {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-void Test(typeEnv *Env);
-void Menu( typeEnv *Env);
-void Display(typeEnv *Env);
+
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
@@ -140,10 +136,24 @@ void Display(typeEnv *Env);
 #define LCD_A0_GPIO_Port GPIOA
 #define LCD_CS_Pin LL_GPIO_PIN_4
 #define LCD_CS_GPIO_Port GPIOA
-#define GREEN_LED_Pin LL_GPIO_PIN_0
-#define GREEN_LED_GPIO_Port GPIOB
-#define SD_CS_Pin LL_GPIO_PIN_10
+#define BUT_DWN_Pin LL_GPIO_PIN_0
+#define BUT_DWN_GPIO_Port GPIOB
+#define SD_CS_Pin LL_GPIO_PIN_1
 #define SD_CS_GPIO_Port GPIOB
+#define BUT_OK_Pin LL_GPIO_PIN_10
+#define BUT_OK_GPIO_Port GPIOB
+#define BUT_UP_Pin LL_GPIO_PIN_11
+#define BUT_UP_GPIO_Port GPIOB
+#define ADR_A_Pin LL_GPIO_PIN_12
+#define ADR_A_GPIO_Port GPIOB
+#define ADR_B_Pin LL_GPIO_PIN_13
+#define ADR_B_GPIO_Port GPIOB
+#define ADR_C_Pin LL_GPIO_PIN_14
+#define ADR_C_GPIO_Port GPIOB
+#define EN_OUT_Pin LL_GPIO_PIN_15
+#define EN_OUT_GPIO_Port GPIOB
+#define EN_INP_Pin LL_GPIO_PIN_8
+#define EN_INP_GPIO_Port GPIOA
 #define BUTTON_Pin LL_GPIO_PIN_15
 #define BUTTON_GPIO_Port GPIOA
 /* USER CODE BEGIN Private defines */
@@ -166,6 +176,8 @@ extern  uint32_t FLAG;
 #define f_RefreshScreen     BBAdr(FLAG,5)
 #define f_EncoderRead       BBAdr(FLAG,6)
 #define f_ButtRead			BBAdr(FLAG,7)
+
+
 
 /* USER CODE END Private defines */
 
