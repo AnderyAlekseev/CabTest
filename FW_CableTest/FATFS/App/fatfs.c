@@ -107,12 +107,13 @@ uint8_t FS_ReadFile(typeEnv *Env)
 {
 	char *FileName = (*Env).FileNameForTest;
 	//memset((*Env).DataForTest, 0, sizeof((*Env).DataForTest));
-	char X1[64]={0}, X2[64]={0};
+	char X1[NLin*2]={0}, X2[NLin*2]={0};
 	char string[DATA_TEST_SIZE]={0}; // строка прочитанная из файла ; 255 байт
+	char FormatStr[5*NLin]={0};// 5 символов в строке форматирования "%d%*c" для одного значения
 	char *p_start=0;
 	char *p_end=0;
-	int LenData=0;
-	uint32_t DataBuf[2][32]={0};
+	int LenData=0, MaxLen=0;
+	uint32_t DataBuf[2][NLin]={0};
 	//uint32_t *DataBuf=(*Env).DataForTest;
 	FIL fs_file;
 	FRESULT fs_result=0;
@@ -138,48 +139,62 @@ uint8_t FS_ReadFile(typeEnv *Env)
 		p_start = strchr(&string, PARS_START_DATA);
 		p_end = strchr(&string, PARS_END_DATA);
 		LenData = p_end - p_start;
+		MaxLen = LenData;
 		memmove(&X1, (p_start+1),  LenData-1);
-		sscanf(&X1, "%d%*c%d%*c%d%*c%d%*c%d%*c%d%*c%d%*c%d%*c%d",	&DataBuf[0][0], \
-																	&DataBuf[0][1], \
-																	&DataBuf[0][2], \
-																	&DataBuf[0][3], \
-																	&DataBuf[0][4], \
-																	&DataBuf[0][5], \
-																	&DataBuf[0][6], \
-																	&DataBuf[0][7], \
-																	&DataBuf[0][8], \
-																	&DataBuf[0][9], \
-																	&DataBuf[0][10], \
-																	&DataBuf[0][11], \
-																	&DataBuf[0][12], \
-																	&DataBuf[0][13], \
-																	&DataBuf[0][14], \
-																	&DataBuf[0][15]);
+		for(uint8_t i=0; i<LenData/2;i++)
+		{
+			strcat( &FormatStr,  "%d%*c");
+
+		}
+		sscanf(&X1, &FormatStr,			&DataBuf[0][0], \
+										&DataBuf[0][1],  &DataBuf[0][2], \
+										&DataBuf[0][3],  &DataBuf[0][4],\
+										&DataBuf[0][5],  &DataBuf[0][6],\
+										&DataBuf[0][7],  &DataBuf[0][8],\
+										&DataBuf[0][9],  &DataBuf[0][10],\
+										&DataBuf[0][11], &DataBuf[0][12],\
+										&DataBuf[0][13], &DataBuf[0][14],\
+										&DataBuf[0][15], &DataBuf[0][16],\
+										&DataBuf[0][17], &DataBuf[0][18],\
+										&DataBuf[0][19], &DataBuf[0][20],\
+										&DataBuf[0][21], &DataBuf[0][22],\
+										&DataBuf[0][23], &DataBuf[0][24],\
+										&DataBuf[0][25], &DataBuf[0][26], \
+										&DataBuf[0][27], &DataBuf[0][28],\
+										&DataBuf[0][29], &DataBuf[0][30], &DataBuf[0][31]);
 		// выделяем данные заключенные в скобки [] для разъёма X2
 		p_start = strchr(p_end, PARS_START_DATA);
 		p_end = strchr(p_start, PARS_END_DATA);
 		LenData = p_end - p_start;
+		if(LenData > MaxLen) {MaxLen = LenData; }
+
 		memmove(&X2, (p_start+1),  LenData-1);
-		sscanf(&X2, "%d%*c%d%*c%d%*c%d%*c%d%*c%d%*c%d%*c%d%*c%d", 	&DataBuf[1][0], \
-																	&DataBuf[1][1], \
-																	&DataBuf[1][2], \
-																	&DataBuf[1][3], \
-																	&DataBuf[1][4], \
-																	&DataBuf[1][5], \
-																	&DataBuf[1][6], \
-																	&DataBuf[1][7], \
-																	&DataBuf[1][8], \
-																	&DataBuf[1][9], \
-																	&DataBuf[1][10], \
-																	&DataBuf[1][11], \
-																	&DataBuf[1][12], \
-																	&DataBuf[1][13], \
-																	&DataBuf[1][14], \
-																	&DataBuf[1][15]);
+
+		memset(FormatStr,0, sizeof(FormatStr));
+		for(uint8_t i=0; i<LenData/2;i++)
+				{			strcat( &FormatStr,  "%d%*c");				}
+
+		sscanf(&X2, &FormatStr, 	&DataBuf[1][0],  &DataBuf[1][1], \
+									&DataBuf[1][2],  &DataBuf[1][3],\
+									&DataBuf[1][4],  &DataBuf[1][5],\
+									&DataBuf[1][6],  &DataBuf[1][7],\
+									&DataBuf[1][8],  &DataBuf[1][9],\
+									&DataBuf[1][10], &DataBuf[1][11],\
+									&DataBuf[1][12], &DataBuf[1][13],\
+									&DataBuf[1][14], &DataBuf[1][15],\
+									&DataBuf[1][16], &DataBuf[1][17],\
+									&DataBuf[1][18], &DataBuf[1][19],\
+									&DataBuf[1][20], &DataBuf[1][21],\
+									&DataBuf[1][22], &DataBuf[1][23],\
+									&DataBuf[1][24], &DataBuf[1][25],\
+									&DataBuf[1][26], &DataBuf[1][27],\
+									&DataBuf[1][28], &DataBuf[1][29],\
+									&DataBuf[1][30], &DataBuf[1][31]);
 	f_close(&fs_file);
 	///*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 	   count_tic = DWT_CYCCNT;//смотрим сколько натикало
 	///*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+	Env->RealDataSize=MaxLen/2;
 	memmove( (*Env).DataForTest, &DataBuf, sizeof(DataBuf)	);
 	return 0;
 }

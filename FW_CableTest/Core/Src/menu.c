@@ -55,12 +55,13 @@ void Menu(typeEnv *Env)
 				}
 				//EncoderCount = currentCount;
 		(*Env).Menu.ActiveItem = ActiveItem;	// ActiveItem сделать указателем
-
+		(*Env).FileNameForTest = Env->Menu.FileList[ActiveItem];
 	}
 
 	if(f_Action !=0)    // если нужно действие в меню (кнопка OK!)
 	{
 		f_Action =0;
+
 		FS_ReadFile(Env);			// прочитать выделенный файл
 		(*Env).Mode = CHECK_SCHEME;	// перейти в режим проверки схемы соединений
 		f_RefreshScreen = 1;				// перерисуй экран
@@ -139,7 +140,7 @@ void ReadKeyPad(void)
 		but_ENC = LL_GPIO_IsInputPinSet(BUTTON_GPIO_Port, BUTTON_Pin)<<3;
 		but_UP  = LL_GPIO_IsInputPinSet(BUT_UP_GPIO_Port, BUT_UP_Pin)<<2;
 		but_OK  = LL_GPIO_IsInputPinSet(BUT_OK_GPIO_Port, BUT_OK_Pin)<<1;
-		but_DWN = LL_GPIO_IsInputPinSet(BUT_DWN_GPIO_Port,BUT_DWN_Pin);
+		but_DWN = LL_GPIO_IsInputPinSet(BUT_DW_GPIO_Port,BUT_DW_Pin);
 		but_latch = but_ENC | but_UP | but_OK | but_DWN;
 
 		if(but_latch !=0xF)

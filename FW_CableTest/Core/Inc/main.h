@@ -50,6 +50,7 @@ extern "C" {
 #include "color565.h"
 #include "ff.h"
 
+#define NLin 32	// максимально количество тестируемых линий
 
 #define FILENAME_SIZE 		(uint8_t)13  								// максимальная длина имени файла для списка
 #define DATA_TEST_SIZE  	(uint8_t)255								// длина строки с данными из файла
@@ -74,7 +75,7 @@ extern "C" {
 /*	 режимы работы (состояния прибора)*/
 #define MENU			1	// отображение и навигация по меню
 #define CHECK_SCHEME	2	// отображение схемы проверки из файла перед запуском теста
-#define TEST			3	// тест - НЕ ПРЕДУСМОТРЕН ОТКЛИК НА КЛАВИАТУРУ
+#define TEST			3	// тест - НЕ ПРЕДУСМОТРЕН ОТКЛ�?К НА КЛАВ�?АТУРУ
 #define RESULT			4	//
 /* коды нажатия кнопок*/
 #define UP		0x0B
@@ -93,7 +94,7 @@ extern "C" {
 /* USER CODE BEGIN ET */
 typedef struct typeMenu{
 	char		FileList[ITEM_ON_PAGE_MAX][FILENAME_SIZE];
-	char	 	ActiveFileNane;
+	char	 	ActiveFileName;
 	short int	ActivePage;
 	short int 	ActiveItem;
 	uint32_t 	NmbrOnPageFiles;
@@ -114,7 +115,7 @@ typedef struct {
 	char Status;
 	char *FileNameForTest;
 	uint8_t Mode;
-	uint32_t DataForTest[2][32];
+	uint32_t DataForTest[2][NLin];
 	uint8_t RealDataSize;
 }typeEnv;
 
@@ -136,7 +137,7 @@ typedef struct {
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
-void ReadKeyPad(void);
+
 /* USER CODE BEGIN EFP */
 
 /* USER CODE END EFP */
@@ -150,8 +151,6 @@ void ReadKeyPad(void);
 #define LCD_A0_GPIO_Port GPIOA
 #define LCD_CS_Pin LL_GPIO_PIN_4
 #define LCD_CS_GPIO_Port GPIOA
-#define BUT_DWN_Pin LL_GPIO_PIN_0
-#define BUT_DWN_GPIO_Port GPIOB
 #define SD_CS_Pin LL_GPIO_PIN_1
 #define SD_CS_GPIO_Port GPIOB
 #define BUT_OK_Pin LL_GPIO_PIN_10
@@ -170,6 +169,8 @@ void ReadKeyPad(void);
 #define EN_INP_GPIO_Port GPIOA
 #define BUTTON_Pin LL_GPIO_PIN_15
 #define BUTTON_GPIO_Port GPIOA
+#define BUT_DW_Pin LL_GPIO_PIN_6
+#define BUT_DW_GPIO_Port GPIOB
 /* USER CODE BEGIN Private defines */
 
 

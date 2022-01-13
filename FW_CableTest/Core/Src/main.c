@@ -165,6 +165,7 @@ int main(void)
   while (1)
   {
 	ReadKeyPad();
+	mode = Env.Mode;
 	switch(mode)	// назначить действие в зависимости от текущего режима
 			{
 				case MENU: 			Menu(&Env); 		break;
