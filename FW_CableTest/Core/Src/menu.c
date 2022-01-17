@@ -89,28 +89,6 @@ void ChekSchem(typeEnv *Env)
 
 }
 
-void Test(typeEnv *Env)
-{
-	if(f_StepMenu != 0) // если вверх или вниз
-		{
-			f_StepMenu = 0;
-			(*Env).Mode = CHECK_SCHEME;
-			f_RefreshScreen = 1;				// перерисуй экран
-		}
-	if(f_Action !=0)    // если нужно действие
-		{
-			f_Action =0;
-			f_StartTest	= 1;// запустить тест
-		}
-
-
-	if(f_StartTest	== 1)
-	{
-		f_StartTest = 0;
-		/* сам тест*/
-
-	}
-}
 
 void Result(typeEnv *Env)
 {

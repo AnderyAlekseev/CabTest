@@ -75,7 +75,7 @@ extern "C" {
 /*	 режимы работы (состояния прибора)*/
 #define MENU			1	// отображение и навигация по меню
 #define CHECK_SCHEME	2	// отображение схемы проверки из файла перед запуском теста
-#define TEST			3	// тест - НЕ ПРЕДУСМОТРЕН ОТКЛ�?К НА КЛАВ�?АТУРУ
+#define TEST			3	// тест - НЕ ПРЕДУСМОТРЕН ОТКЛ�?К НА КЛАВ�?АТУРУ
 #define RESULT			4	//
 /* коды нажатия кнопок*/
 #define UP		0x0B
@@ -133,13 +133,24 @@ typedef struct {
 /* USER CODE BEGIN EM */
 #define str(x) #x
 #define xstr(x) str(x)
+
+// измерение времени выполнения куска кода в машинных тиках
+#define    DWT_CYCCNT    *(volatile unsigned long *)0xE0001004
+#define    DWT_CONTROL   *(volatile unsigned long *)0xE0001000
+#define    SCB_DEMCR     *(volatile unsigned long *)0xE000EDFC
+extern uint32_t count_tic;
 /* USER CODE END EM */
 
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void ReadKeyPad(void);
+void Result(typeEnv *Env);
+void Test(typeEnv *Env);
+void ChekSchem(typeEnv *Env);
+void Menu(typeEnv *Env);
+void Display(typeEnv *Env);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -157,16 +168,22 @@ void Error_Handler(void);
 #define BUT_OK_GPIO_Port GPIOB
 #define BUT_UP_Pin LL_GPIO_PIN_11
 #define BUT_UP_GPIO_Port GPIOB
-#define ADR_A_Pin LL_GPIO_PIN_12
-#define ADR_A_GPIO_Port GPIOB
-#define ADR_B_Pin LL_GPIO_PIN_13
-#define ADR_B_GPIO_Port GPIOB
-#define ADR_C_Pin LL_GPIO_PIN_14
-#define ADR_C_GPIO_Port GPIOB
-#define EN_OUT_Pin LL_GPIO_PIN_15
-#define EN_OUT_GPIO_Port GPIOB
-#define EN_INP_Pin LL_GPIO_PIN_8
-#define EN_INP_GPIO_Port GPIOA
+#define OUT_A_Pin LL_GPIO_PIN_12
+#define OUT_A_GPIO_Port GPIOB
+#define OUT_B_Pin LL_GPIO_PIN_13
+#define OUT_B_GPIO_Port GPIOB
+#define OUT_C_Pin LL_GPIO_PIN_14
+#define OUT_C_GPIO_Port GPIOB
+#define OUT_EN_Pin LL_GPIO_PIN_15
+#define OUT_EN_GPIO_Port GPIOB
+#define IN_A_Pin LL_GPIO_PIN_8
+#define IN_A_GPIO_Port GPIOA
+#define IN_B_Pin LL_GPIO_PIN_9
+#define IN_B_GPIO_Port GPIOA
+#define IN_C_Pin LL_GPIO_PIN_10
+#define IN_C_GPIO_Port GPIOA
+#define IN_EN_Pin LL_GPIO_PIN_12
+#define IN_EN_GPIO_Port GPIOA
 #define BUTTON_Pin LL_GPIO_PIN_15
 #define BUTTON_GPIO_Port GPIOA
 #define BUT_DW_Pin LL_GPIO_PIN_6
@@ -196,6 +213,30 @@ extern  uint32_t FLAG;
 #define f_Action			BBAdr(FLAG,10)
 #define f_StartTest			BBAdr(FLAG,11)
 
+
+/**
+   * @param  GPIOx GPIO Port
+  * @param  PinMask This parameter can be a combination of the following values:
+  *         @arg @ref LL_GPIO_PIN_0
+  *         @arg @ref LL_GPIO_PIN_1
+  *         @arg @ref LL_GPIO_PIN_2
+  *         @arg @ref LL_GPIO_PIN_3
+  *         @arg @ref LL_GPIO_PIN_4
+  *         @arg @ref LL_GPIO_PIN_5
+  *         @arg @ref LL_GPIO_PIN_6
+  *         @arg @ref LL_GPIO_PIN_7
+  *         @arg @ref LL_GPIO_PIN_8
+  *         @arg @ref LL_GPIO_PIN_9
+  *         @arg @ref LL_GPIO_PIN_10
+  *         @arg @ref LL_GPIO_PIN_11
+  *         @arg @ref LL_GPIO_PIN_12
+  *         @arg @ref LL_GPIO_PIN_13
+  *         @arg @ref LL_GPIO_PIN_14
+  *         @arg @ref LL_GPIO_PIN_15
+  *         @arg @ref LL_GPIO_PIN_ALL
+  * @retval None
+  */
+void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin, uint8_t BitVal);
 
 /* USER CODE END Private defines */
 

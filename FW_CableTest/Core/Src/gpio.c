@@ -29,6 +29,10 @@
 /*----------------------------------------------------------------------------*/
 /* USER CODE BEGIN 1 */
 
+
+
+
+
 /* USER CODE END 1 */
 
 /** Configure pins as
@@ -53,11 +57,12 @@ void MX_GPIO_Init(void)
   LL_GPIO_ResetOutputPin(LED_GPIO_Port, LED_Pin);
 
   /**/
-  LL_GPIO_ResetOutputPin(GPIOA, LCD_RESET_Pin|LCD_A0_Pin|LCD_CS_Pin|EN_INP_Pin);
+  LL_GPIO_ResetOutputPin(GPIOA, LCD_RESET_Pin|LCD_A0_Pin|LCD_CS_Pin|IN_A_Pin
+                          |IN_B_Pin|IN_C_Pin|IN_EN_Pin);
 
   /**/
-  LL_GPIO_ResetOutputPin(GPIOB, SD_CS_Pin|ADR_A_Pin|ADR_B_Pin|ADR_C_Pin
-                          |EN_OUT_Pin);
+  LL_GPIO_ResetOutputPin(GPIOB, SD_CS_Pin|OUT_A_Pin|OUT_B_Pin|OUT_C_Pin
+                          |OUT_EN_Pin);
 
   /**/
   GPIO_InitStruct.Pin = LED_Pin;
@@ -75,7 +80,8 @@ void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /**/
-  GPIO_InitStruct.Pin = LCD_A0_Pin|EN_INP_Pin;
+  GPIO_InitStruct.Pin = LCD_A0_Pin|IN_A_Pin|IN_B_Pin|IN_C_Pin
+                          |IN_EN_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
@@ -96,7 +102,7 @@ void MX_GPIO_Init(void)
   LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /**/
-  GPIO_InitStruct.Pin = ADR_A_Pin|ADR_B_Pin|ADR_C_Pin|EN_OUT_Pin;
+  GPIO_InitStruct.Pin = OUT_A_Pin|OUT_B_Pin|OUT_C_Pin|OUT_EN_Pin;
   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
@@ -111,6 +117,25 @@ void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 2 */
+void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin, uint8_t BitVal)
+{
+	/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+	//DWT_CYCCNT = 0;// обнуляем значение
+	/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+	//BitVal ?  LL_GPIO_SetOutputPin(GPIOx, GPIO_Pin) : LL_GPIO_ResetOutputPin(GPIOx, GPIO_Pin) ;
+  if (BitVal != RESET)
+  {
+    LL_GPIO_SetOutputPin(GPIOx, GPIO_Pin);
+  }
+  else
+  {
+	  LL_GPIO_ResetOutputPin(GPIOx, GPIO_Pin);
+  }
+	/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+	//	   count_tic = DWT_CYCCNT;//смотрим сколько натикало
+	/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+
+}
 
 /* USER CODE END 2 */
 

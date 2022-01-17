@@ -36,6 +36,7 @@
 /* USER CODE BEGIN PTD */
 typeEnv Env;
 uint32_t FLAG;
+uint32_t count_tic = 0; // счётчик тиков для подсчёта времени выполнения кода
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -73,7 +74,9 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	FATFS	FatFs; 	//Fatfs handle
+	FRESULT resFS;
 	char status[20] = "123456";
+	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;
 	Env.Menu.ActiveItem=0;
 	Env.Menu.ActivePage=0;
 	Env.Mode = MENU;
@@ -94,20 +97,24 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
+  /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
+  		  SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;// разрешаем использовать DWT // измерение времени выполнения куска кода в машинных тиках
+  		  DWT_CYCCNT = 0;// обнуляем значение
+  		  DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; // включаем счётчик
+  		/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-//  LL_SPI_Enable(SPI1);// включить SPI после инициализации
+//  LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CRC_Init();
   MX_SPI1_Init();
-  LL_SPI_Enable(SPI1);// включить SPI после инициализации
   MX_FATFS_Init();
   MX_TIM3_Init();
   MX_TIM1_Init();
@@ -120,41 +127,33 @@ int main(void)
 	LL_TIM_SetCounter(TIM3, 0x7fff);
 	LL_GPIO_AF_RemapPartial_TIM3();
 	LL_TIM_EnableCounter(TIM3);
+
+	LL_TIM_EnableAllOutputs(TIM1);
+
+	HAL_Delay(500);
+	LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS
+	resFS = f_mount(&FatFs, "", 1); //Монтируем файловую систему до первого использования SPI дисплеем
+
 	HAL_ST7735_Init();
- //Монтируем файловую систему
 
-	if(f_mount(&FatFs, "", 1) != FR_OK)
-	{
-		ST7735_Clear(Env.Menu.DANGER_BGR_Color);
-		sprintf(status, "SD card" );
-		ST7735_DrawString7x11(39,1, status,Env.Menu.DANGER_TXT_Color,Env.Menu.DANGER_BGR_Color);
-		sprintf(status, "not find" );
-		ST7735_DrawString7x11(27,LINE_HEIGTH*1, status,Env.Menu.DANGER_TXT_Color, Env.Menu.DANGER_BGR_Color);
-		sprintf(status, "Insert SD card" );
-		ST7735_DrawString7x11(8,LINE_HEIGTH*2, status, Env.Menu.DANGER_TXT_Color, Env.Menu.DANGER_BGR_Color);
-		sprintf(status, "and reboot" );
-		ST7735_DrawString7x11(29,LINE_HEIGTH*3, status,Env.Menu.DANGER_TXT_Color, Env.Menu.DANGER_BGR_Color);
-		sprintf(status, "device" );
-		ST7735_DrawString7x11(42,LINE_HEIGTH*4, status,Env.Menu.DANGER_TXT_Color, Env.Menu.DANGER_BGR_Color);
-		while(1);
-	}
+	if(resFS != FR_OK)
+				{
+				ST7735_Clear(DANGER_BGR_COLOR);
+				sprintf(status, "SD card" );
+				ST7735_DrawString7x11(39,1, status,DANGER_TXT_COLOR,DANGER_BGR_COLOR);
+				sprintf(status, "not find" );
+				ST7735_DrawString7x11(27,LINE_HEIGTH*1, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+				sprintf(status, "Insert SD card" );
+				ST7735_DrawString7x11(8,LINE_HEIGTH*2, status, DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+				sprintf(status, "and reboot" );
+				ST7735_DrawString7x11(29,LINE_HEIGTH*3, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+				sprintf(status, "device" );
+				ST7735_DrawString7x11(42,LINE_HEIGTH*4, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+				while( 1);
+				}
 
 
-								{
-								/*
-									// Статистика по SD карте
-									DWORD free_clusters, free_sectors, total_sectors;
-									FATFS* getFreeFs;
-									fres = f_getfree("", &free_clusters, &getFreeFs);
-									if (fres != FR_OK) {
-									//myprintf("f_getfree error (%i)\r\n", fres);
-									while(1);
-									}
-									//Formula comes from ChaN's documentation
-									total_sectors = (getFreeFs->n_fatent - 2) * getFreeFs->csize;
-									free_sectors = free_clusters * getFreeFs->csize;
-								*/
-								}
+
   /* USER CODE END 2 */
 
   /* Infinite loop */

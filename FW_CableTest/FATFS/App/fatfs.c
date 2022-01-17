@@ -24,15 +24,9 @@ FATFS USERFatFS;    /* File system object for USER logical drive */
 FIL USERFile;       /* File object for USER */
 
 /* USER CODE BEGIN Variables */
-// измерение времени выполнения куска кода в машинных тиках
-#define    DWT_CYCCNT    *(volatile unsigned long *)0xE0001004
-#define    DWT_CONTROL   *(volatile unsigned long *)0xE0001000
-#define    SCB_DEMCR     *(volatile unsigned long *)0xE000EDFC
-extern uint32_t count_tic;
+
 
 uint8_t FATFS_LinkDriver(Diskio_drvTypeDef *drv, char *path);
-
-uint32_t count_tic = 0; // счётчик тиков для подсчёта времени выполнения кода
 
 /* USER CODE END Variables */
 
@@ -121,16 +115,7 @@ uint8_t FS_ReadFile(typeEnv *Env)
 	uint32_t ofs=0;	// смещение от начала файла
 	fs_result = f_open(&fs_file, FileName, FA_READ);
 		if(fs_result != FR_OK)	{ return 1; }
-
-		/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-		  SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;// разрешаем использовать DWT // измерение времени выполнения куска кода в мащинных тиках
-		  DWT_CYCCNT = 0;// обнуляем значение
-		  DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; // включаем счётчик
-		/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-
-
-
-		// читаем всесь файл в буфер
+// читаем всесь файл в буфер
 		fs_result = f_read(&fs_file, string, DATA_TEST_SIZE, &byteRead);
 		if(fs_result != FR_OK)	{ return 1; }
 		(*Env).RealDataSize = byteRead;
@@ -191,9 +176,6 @@ uint8_t FS_ReadFile(typeEnv *Env)
 									&DataBuf[1][28], &DataBuf[1][29],\
 									&DataBuf[1][30], &DataBuf[1][31]);
 	f_close(&fs_file);
-	///*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-	   count_tic = DWT_CYCCNT;//смотрим сколько натикало
-	///*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
 	Env->RealDataSize=MaxLen/2;
 	memmove( (*Env).DataForTest, &DataBuf, sizeof(DataBuf)	);
 	return 0;
