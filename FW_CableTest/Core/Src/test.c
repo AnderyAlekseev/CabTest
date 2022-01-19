@@ -33,8 +33,8 @@ void Test(typeEnv *Env)
 		{
 			MuxSetOUT_Addr(out_addr);	// установить номер выхода
 			GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
-			LL_TIM_EnableCounter(TIM1);	// включить генерацию ШИМ таймер 1
-			LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH4);
+			LL_TIM_EnableCounter(TIM1);
+			LL_TIM_EnableCounter(TIM4);
 
 			for(uint8_t in_addr=0; in_addr<8; in_addr++)
 			{

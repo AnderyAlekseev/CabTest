@@ -76,7 +76,7 @@ int main(void)
 	FATFS	FatFs; 	//Fatfs handle
 	FRESULT resFS;
 	char status[20] = "123456";
-	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;
+	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;//   / - \ |
 	Env.Menu.ActiveItem=0;
 	Env.Menu.ActivePage=0;
 	Env.Mode = MENU;
@@ -119,6 +119,7 @@ int main(void)
   MX_TIM3_Init();
   MX_TIM1_Init();
   MX_TIM2_Init();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_4, LL_GPIO_MODE_INPUT);
 	LL_GPIO_SetPinPull(GPIOB, LL_GPIO_PIN_4, LL_GPIO_PULL_UP);
@@ -127,9 +128,11 @@ int main(void)
 	LL_TIM_SetCounter(TIM3, 0x7fff);
 	LL_GPIO_AF_RemapPartial_TIM3();
 	LL_TIM_EnableCounter(TIM3);
+	LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH4);
+	LL_TIM_CC_EnableChannel(TIM4, LL_TIM_CHANNEL_CH2);
 
-	LL_TIM_EnableAllOutputs(TIM1);
-
+	LL_TIM_EnableCounter(TIM1);
+	LL_TIM_EnableCounter(TIM4);
 	HAL_Delay(500);
 	LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS
 	resFS = f_mount(&FatFs, "", 1); //Монтируем файловую систему до первого использования SPI дисплеем

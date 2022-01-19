@@ -1,6 +1,5 @@
 stm32f1xx_ll_tim.h:1008:22:LL_TIM_EnableCounter	16	static
 stm32f1xx_ll_tim.h:1019:22:LL_TIM_DisableCounter	16	static
-stm32f1xx_ll_tim.h:1474:22:LL_TIM_CC_EnableChannel	16	static
 stm32f1xx_ll_gpio.h:833:22:LL_GPIO_ResetOutputPin	16	static
 test.c:11:6:Test	24	static
 test.c:53:6:TestProsed	4	static
