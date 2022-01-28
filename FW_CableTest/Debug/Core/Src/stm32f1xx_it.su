@@ -16,10 +16,10 @@ stm32f1xx_it.c:166:6:DebugMon_Handler	4	static
 stm32f1xx_it.c:179:6:PendSV_Handler	4	static
 stm32f1xx_it.c:192:6:SysTick_Handler	8	static
 stm32f1xx_it.c:213:6:TIM1_TRG_COM_IRQHandler	8	static
-stm32f1xx_it.c:226:6:TIM2_IRQHandler	16	static
-stm32f1xx_it.c:246:6:TIM4_IRQHandler	8	static
-stm32f1xx_it.c:260:6:timer_1ms	8	static
-stm32f1xx_it.c:268:6:Flags_1ms	8	static
-stm32f1xx_it.c:280:6:Flags_10msec	8	static
-stm32f1xx_it.c:291:6:Flags_100ms	8	static
-stm32f1xx_it.c:302:6:Flags_1s	4	static
+stm32f1xx_it.c:227:6:TIM2_IRQHandler	8	static
+stm32f1xx_it.c:248:6:TIM4_IRQHandler	8	static
+stm32f1xx_it.c:262:6:timer_1ms	8	static
+stm32f1xx_it.c:270:6:Flags_1ms	8	static
+stm32f1xx_it.c:282:6:Flags_10msec	8	static
+stm32f1xx_it.c:293:6:Flags_100ms	8	static
+stm32f1xx_it.c:304:6:Flags_1s	4	static

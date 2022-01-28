@@ -51,7 +51,7 @@ uint32_t count_tic = 0; // счётчик тиков для подсчёта в�
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-
+uint16_t Pulse=0, Period=0, N_periods=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -124,9 +124,11 @@ int main(void)
 	LL_GPIO_AF_RemapPartial_TIM3();
 	LL_TIM_EnableCounter(TIM3);
 	LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH4);
+	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH1);
+//	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH2);
 	LL_TIM_CC_EnableChannel(TIM4, LL_TIM_CHANNEL_CH2);
 
-//	LL_TIM_EnableCounter(TIM1);
+	LL_TIM_EnableCounter(TIM1);
 //	LL_TIM_EnableCounter(TIM4);
 	HAL_Delay(500);
 	LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS

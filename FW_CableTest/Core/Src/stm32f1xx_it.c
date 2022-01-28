@@ -223,14 +223,16 @@ void TIM1_TRG_COM_IRQHandler(void)
 /**
   * @brief This function handles TIM2 global interrupt.
   */
-void TIM2_IRQHandler(typeEnv *Env)
+extern uint16_t Pulse, Period, N_periods;
+void TIM2_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM2_IRQn 0 */
 	if(LL_TIM_IsActiveFlag_CC1(TIM2))
 		{
 			LL_TIM_ClearFlag_CC1(TIM2);
-			(*Env).period = LL_TIM_OC_GetCompareCH1(TIM2);
-			(*Env).pulse = 	LL_TIM_OC_GetCompareCH2(TIM2);
+			Period += LL_TIM_OC_GetCompareCH1(TIM2);
+			Pulse  = LL_TIM_OC_GetCompareCH2(TIM2);
+			N_periods++;
 			LL_TIM_SetCounter(TIM2, 0);
 		}
 

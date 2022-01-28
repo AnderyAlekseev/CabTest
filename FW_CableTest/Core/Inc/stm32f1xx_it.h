@@ -57,7 +57,7 @@ void DebugMon_Handler(void);
 void PendSV_Handler(void);
 void SysTick_Handler(void);
 void TIM1_TRG_COM_IRQHandler(void);
-void TIM2_IRQHandler(typeEnv *Env);
+void TIM2_IRQHandler(void);
 void TIM4_IRQHandler(void);
 /* USER CODE BEGIN EFP */
 extern void timer_1ms(void);
