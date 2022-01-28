@@ -79,14 +79,9 @@ int main(void)
 	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;//   / - \ |
 	Env.Menu.ActiveItem=0;
 	Env.Menu.ActivePage=0;
+	Env.period=0;
+	Env.pulse=0;
 	Env.Mode = MENU;
-	Env.Menu.BGR_Color = COLOR565_DARK_BLUE;	// background
-	Env.Menu.TXT_Color	= COLOR565_ALICE_BLUE;	// текст
-	Env.Menu.SEL_Color	= COLOR565_BLUE;		// выделение
-	Env.Menu.BRD_Color	= COLOR565_ALICE_BLUE;	// border
-	Env.Menu.DANGER_TXT_Color	=COLOR565_WHITE;
-	Env.Menu.DANGER_BGR_Color	=COLOR565_RED;
-
 	uint8_t mode = Env.Mode;
 	f_RefreshScreen = 1;
   /* USER CODE END 1 */
@@ -131,8 +126,8 @@ int main(void)
 	LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH4);
 	LL_TIM_CC_EnableChannel(TIM4, LL_TIM_CHANNEL_CH2);
 
-	LL_TIM_EnableCounter(TIM1);
-	LL_TIM_EnableCounter(TIM4);
+//	LL_TIM_EnableCounter(TIM1);
+//	LL_TIM_EnableCounter(TIM4);
 	HAL_Delay(500);
 	LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS
 	resFS = f_mount(&FatFs, "", 1); //Монтируем файловую систему до первого использования SPI дисплеем

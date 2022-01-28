@@ -100,12 +100,7 @@ typedef struct typeMenu{
 	uint32_t 	NmbrOnPageFiles;
 	uint32_t 	NmbrAllFiles;
 	uint32_t 	NmbrAllPages;
-	uint16_t	BGR_Color;	// фон
-	uint16_t	TXT_Color;	// текст
-	uint16_t	BRD_Color;	// бордер
-	uint16_t	SEL_Color;	// выделение
-	uint16_t	DANGER_TXT_Color;	//
-	uint16_t	DANGER_BGR_Color;	//
+
 
 }typeMenu;
 
@@ -117,6 +112,8 @@ typedef struct {
 	uint8_t Mode;
 	uint32_t DataForTest[2][NLin];
 	uint8_t RealDataSize;
+	uint16_t	period;
+	uint16_t	pulse;
 }typeEnv;
 
 

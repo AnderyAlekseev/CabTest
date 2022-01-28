@@ -207,6 +207,55 @@ void SysTick_Handler(void)
 /* please refer to the startup file (startup_stm32f1xx.s).                    */
 /******************************************************************************/
 
+/**
+  * @brief This function handles TIM1 trigger and commutation interrupts.
+  */
+void TIM1_TRG_COM_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM1_TRG_COM_IRQn 0 */
+	LL_GPIO_ResetOutputPin(LED_GPIO_Port, LED_Pin);
+  /* USER CODE END TIM1_TRG_COM_IRQn 0 */
+  /* USER CODE BEGIN TIM1_TRG_COM_IRQn 1 */
+
+  /* USER CODE END TIM1_TRG_COM_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM2 global interrupt.
+  */
+void TIM2_IRQHandler(typeEnv *Env)
+{
+  /* USER CODE BEGIN TIM2_IRQn 0 */
+	if(LL_TIM_IsActiveFlag_CC1(TIM2))
+		{
+			LL_TIM_ClearFlag_CC1(TIM2);
+			(*Env).period = LL_TIM_OC_GetCompareCH1(TIM2);
+			(*Env).pulse = 	LL_TIM_OC_GetCompareCH2(TIM2);
+			LL_TIM_SetCounter(TIM2, 0);
+		}
+
+  /* USER CODE END TIM2_IRQn 0 */
+  /* USER CODE BEGIN TIM2_IRQn 1 */
+
+  /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM4 global interrupt.
+  */
+void TIM4_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM4_IRQn 0 */
+	if(LL_TIM_IsActiveFlag_UPDATE(TIM4) == 1)
+	{
+		LL_TIM_ClearFlag_UPDATE(TIM4);
+	}
+  /* USER CODE END TIM4_IRQn 0 */
+  /* USER CODE BEGIN TIM4_IRQn 1 */
+
+  /* USER CODE END TIM4_IRQn 1 */
+}
+
 /* USER CODE BEGIN 1 */
 void timer_1ms(void)
 {
