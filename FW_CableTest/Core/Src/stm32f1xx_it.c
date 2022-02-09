@@ -213,7 +213,10 @@ void SysTick_Handler(void)
 void TIM1_TRG_COM_IRQHandler(void)
 {
   /* USER CODE BEGIN TIM1_TRG_COM_IRQn 0 */
-	LL_GPIO_ResetOutputPin(LED_GPIO_Port, LED_Pin);
+	if(LL_TIM_IsActiveFlag_UPDATE(TIM1))
+		{
+			LL_TIM_ClearFlag_UPDATE(TIM1);
+		}
   /* USER CODE END TIM1_TRG_COM_IRQn 0 */
   /* USER CODE BEGIN TIM1_TRG_COM_IRQn 1 */
 

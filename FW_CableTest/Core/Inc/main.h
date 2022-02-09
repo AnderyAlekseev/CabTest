@@ -50,7 +50,8 @@ extern "C" {
 #include "color565.h"
 #include "ff.h"
 
-#define NLin 32	// максимально количество тестируемых линий
+#define NLin 32	// максимальное количество тестируемых линий
+#define NCheckLine 8	// количество тестируемых линий
 
 #define FILENAME_SIZE 		(uint8_t)13  								// максимальная длина имени файла для списка
 #define DATA_TEST_SIZE  	(uint8_t)255								// длина строки с данными из файла
@@ -111,6 +112,7 @@ typedef struct {
 	char *FileNameForTest;
 	uint8_t Mode;
 	uint32_t DataForTest[2][NLin];
+	uint8_t CheckLine[NCheckLine];
 	uint8_t RealDataSize;
 	uint16_t	period;
 	uint16_t	pulse;

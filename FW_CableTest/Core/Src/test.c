@@ -7,7 +7,8 @@
 #include "main.h"
 void MuxSetIN_Addr(uint8_t addr);
 void MuxSetOUT_Addr(uint8_t addr);
-
+void TestProsed(typeEnv *Env);
+void DrawTable(typeEnv *Env, uint8_t res);
 
 extern uint16_t Pulse, Period, N_periods;
 
@@ -32,43 +33,130 @@ void Test(typeEnv *Env)
 	{
 		f_StartTest = 0;
 		/* сам тест*/
-
-			LL_TIM_EnableIT_CC1(TIM2);
-			LL_TIM_EnableCounter(TIM2);
-
-					for(uint8_t out_addr=0; out_addr<8; out_addr++)
-					{
-						MuxSetOUT_Addr(out_addr);	// установить номер выхода
-						GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
-
-						for(uint8_t in_addr=0; in_addr<8; in_addr++)
-						{
-							N_periods=0;
-							Period	=0;
-							MuxSetIN_Addr(in_addr);	// установить номер входа
-							GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
-							LL_TIM_EnableCounter(TIM4);
-							HAL_Delay(1);
-							LL_TIM_DisableCounter(TIM4);
-							GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
-							N_periods=0;
-							Period	=0;
-						}
-						GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
-					}
-
-			LL_TIM_DisableIT_CC1(TIM2);
-			LL_TIM_DisableCounter(TIM4);
-			LL_TIM_DisableCounter(TIM2);
-			LL_TIM_DisableCounter(TIM1);
-
+		TestProsed(Env);
 
 	}
 }
 
-void TestProsed()
-{
 
+/************************************
+ *
+ *
+ * **********************************/
+
+void TestProsed(typeEnv *Env)
+{
+	uint16_t X2[8][8] = {0};
+	uint8_t in_addr=0, out_addr=0;
+	uint8_t check=0, indx=0;
+	LL_TIM_EnableIT_CC1(TIM2); // захват принятого сигнала
+
+	//LL_TIM_EnableCounter(TIM1);// генерация тестового сигнала
+	LL_TIM_ClearFlag_UPDATE(TIM4);
+	memset(X2, 0, sizeof(X2));
+			for( out_addr=0; out_addr<NCheckLine; out_addr++)
+			{
+				MuxSetOUT_Addr(out_addr);	// установить номер выхода X1
+				GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
+				for( in_addr=0; in_addr<8; in_addr++)
+				{
+
+					MuxSetIN_Addr(in_addr);	// установить номер входа X2
+					GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
+
+					LL_TIM_EnableCounter(TIM2);// включить захват принятого сигнала
+					N_periods=0;
+					LL_TIM_EnableCounter(TIM4);	// триггер для запуска тестового сигнала
+
+					while( !LL_TIM_IsActiveFlag_UPDATE(TIM4)){}
+					LL_TIM_DisableCounter(TIM4);// вЫключить триггер для запуска тестового сигнала
+					LL_TIM_ClearFlag_UPDATE(TIM4);
+					LL_TIM_DisableCounter(TIM2);// вЫключить захват принятого сигнала
+
+					GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
+					if( N_periods == 10)
+					{
+						X2[out_addr][in_addr]=1;
+					}
+
+				}
+				GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
+
+			}
+			for(indx=0; indx<NCheckLine; indx++ )
+			{
+				out_addr = (*Env).DataForTest[0][indx];
+				in_addr  = (*Env).DataForTest[1][indx];
+				if(out_addr!=0)
+				{
+					if(X2[out_addr-1][in_addr-1] == 1)
+					{
+						(*Env).CheckLine[indx] = 1; // линия исправна
+					}
+					else
+					{
+						(*Env).CheckLine[indx] = 2; // линия не исправна
+					}
+				}
+				else
+				{
+					(*Env).CheckLine[indx] = 0;  // нет линии
+				}
+
+			}
+	DrawTable(Env, 0);
+	LL_TIM_DisableIT_CC1(TIM2);
+
+}
+
+void DrawTable(typeEnv *Env, uint8_t res)
+{
+	uint8_t h=17, w=16;
+	uint8_t col=8, row=5;
+	uint8_t sx=20, ex=col*w+sx;
+	uint8_t sy=23, ey=row*h+sy;
+	uint8_t indx_col=0, indx_row=0;
+	uint8_t CHR[3]={0};
+	uint16_t color=0;
+	memset(CHR,0,sizeof(CHR));
+	for(indx_col=0; indx_col<=col; indx_col++)
+	{
+		ST7735_DrawVLine(sx+indx_col*w,sy,ey,TXT_COLOR);
+	}
+	for(indx_row=0;indx_row<=row;indx_row++)
+	{
+		ST7735_DrawHLine(sx,ex,sy+indx_row*h,TXT_COLOR);
+	}
+
+	for(indx_col=0; indx_col<col; indx_col++)
+	{
+		memset(CHR,0,sizeof(CHR));
+		sprintf(CHR, "%d ", (*Env).DataForTest[0][indx_col]);
+		ST7735_DrawString7x11(sx+5+indx_col*w,sy+4+h,CHR,TXT_COLOR,BGR_COLOR);
+	}
+
+	for(indx_col=0; indx_col<col; indx_col++)
+	{
+		memset(CHR,0,sizeof(CHR));
+		sprintf(CHR, "%d ", (*Env).DataForTest[1][indx_col]);
+		ST7735_DrawString7x11(sx+5+indx_col*w,sy+4+3*h,CHR,TXT_COLOR,BGR_COLOR);
+	}
+	for(indx_col=0; indx_col<NCheckLine; indx_col++)
+	{
+		if( (*Env).CheckLine[indx_col] == 1)
+		{
+			color = COLOR565_LAWN_GREEN;
+		}
+		else if((*Env).CheckLine[indx_col] == 2)
+		{
+			color = COLOR565_ORANGE_RED;
+		}
+		else
+		{
+			color = BGR_COLOR;
+		}
+		ST7735_DrawString7x11(sx+5+indx_col*w,sy+4+2*h,"*",color,BGR_COLOR);
+	}
 }
 
 
