@@ -46,19 +46,33 @@ void Test(typeEnv *Env)
 
 void TestProsed(typeEnv *Env)
 {
-	uint16_t X2[8][8] = {0};
-	uint8_t in_addr=0, out_addr=0;
-	uint8_t check=0, indx=0;
+	uint16_t X1[8][8] = {0}, X2[8][8] = {0};
+	uint16_t in_addr=0, out_addr=0, n_line=0;
+	uint16_t check=0, indx=0;
 	LL_TIM_EnableIT_CC1(TIM2); // захват принятого сигнала
 
 	//LL_TIM_EnableCounter(TIM1);// генерация тестового сигнала
 	LL_TIM_ClearFlag_UPDATE(TIM4);
+	memset(X1, 0, sizeof(X1));
 	memset(X2, 0, sizeof(X2));
+	memset((*Env).CheckLine, 0 ,sizeof((*Env).CheckLine));
+
+	for( indx=0; indx<NCheckLine; indx++)
+	{
+		uint8_t i, j;
+		i=(*Env).DataForTest[0][indx];
+		j=(*Env).DataForTest[1][indx];
+		if(i!=0 || j!=0)
+		{
+			X1[i-1][j-1]=1;
+		}
+	}
+
 			for( out_addr=0; out_addr<NCheckLine; out_addr++)
 			{
 				MuxSetOUT_Addr(out_addr);	// установить номер выхода X1
 				GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
-				for( in_addr=0; in_addr<8; in_addr++)
+				for( in_addr=0; in_addr<NCheckLine; in_addr++)
 				{
 
 					MuxSetIN_Addr(in_addr);	// установить номер входа X2
@@ -83,27 +97,39 @@ void TestProsed(typeEnv *Env)
 				GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
 
 			}
-			for(indx=0; indx<NCheckLine; indx++ )
-			{
-				out_addr = (*Env).DataForTest[0][indx];
-				in_addr  = (*Env).DataForTest[1][indx];
-				if(out_addr!=0)
-				{
-					if(X2[out_addr-1][in_addr-1] == 1)
-					{
-						(*Env).CheckLine[indx] = 1; // линия исправна
-					}
-					else
-					{
-						(*Env).CheckLine[indx] = 2; // линия не исправна
-					}
-				}
-				else
-				{
-					(*Env).CheckLine[indx] = 0;  // нет линии
-				}
 
+			uint16_t NoLineX1=0, NoLineX2=0;
+			n_line = 0;
+
+			for( out_addr=0; out_addr<NCheckLine; out_addr++)
+			{
+				NoLineX1=0, NoLineX2=0, check =0;
+
+					for( in_addr=0; in_addr<NCheckLine; in_addr++)
+						{
+						NoLineX1+=X1[out_addr][in_addr];  // сумма значений в столбце, если ==0, не соединений
+						NoLineX2+=X2[out_addr][in_addr];
+
+							if(X1[out_addr][in_addr] == X2[out_addr][in_addr])
+							{
+								check = 1;
+							}
+							else
+							{
+								check = 2;
+								break;
+							}
+						}
+
+
+					if(NoLineX1 != 0 && NoLineX2 != 0 )
+					{
+						(*Env).CheckLine[n_line++] = check;
+					}
 			}
+
+
+
 	DrawTable(Env, 0);
 	LL_TIM_DisableIT_CC1(TIM2);
 
