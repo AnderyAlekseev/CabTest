@@ -84,6 +84,9 @@ extern "C" {
 #define OK		0x0D
 #define ENC_BUT	0x07
 
+/*Координаты для строки сообщений*/
+#define Mx 15
+#define My 112
 /* ПАРАМЕТРЫ ЧТЕН�?Я Д�?РЕКТОР�?�? SD карты
  * используется в  FS_GetFileList()*/
 //#define FS_ALL_DIR		1		// читать все файлы, чтобы узнать количество всех файлов
@@ -206,7 +209,7 @@ extern  uint32_t FLAG;
 #define f_1min              BBAdr(FLAG,4)
 #define f_RefreshScreen     BBAdr(FLAG,5)
 #define f_ReadKeyPad        BBAdr(FLAG,6)
-//#define f_ButtRead			BBAdr(FLAG,7)
+#define f_waitTick			BBAdr(FLAG,7)
 #define f_StepMenu			BBAdr(FLAG,8)
 #define f_DirStepMenu		BBAdr(FLAG,9)
 #define f_Action			BBAdr(FLAG,10)

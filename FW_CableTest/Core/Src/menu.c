@@ -12,6 +12,7 @@ uint8_t FS_ReadFile(typeEnv *Env);
 void ParseString(char  *str_in, char *data_out);
 void Keyboard_handler(uint8_t key);
 void Encoder_handler(uint16_t LastCount, uint16_t CurrCount );
+uint8_t CheckConnect(typeEnv *Env);
 
 const uint16_t  COLORS565[140] = {0xF7DF, 0xFF5A, 0x07FF, 0x7FFA, 0xF7FF, 0xF7BB, 0xFF38, 0x0, 0xFF59, 0x001F, 0x895C, 0xA145, 0xDDD0, 0x5CF4, 0x7FE0, 0xD343, 0xFBEA, 0x64BD, 0xFFDB, 0xD8A7, 0x07FF, 0x11, 0x451, 0xBC21, 0xAD55, 0x320, 0xBDAD, 0x8811, 0x5345, 0xFC60, 0x9999, 0x8800, 0xECAF, 0x8DF1, 0x49F1, 0x2A69, 0x067A, 0x901A, 0xF8B2, 0x05FF, 0x6B4D, 0x1C9F, 0xB104, 0xFFDE, 0x2444, 0xF81F, 0xDEFB, 0xFFDF, 0xFEA0, 0xDD24, 0x8410, 0x400, 0xAFE5, 0xF7FE, 0xFB56, 0xCAEB, 0x4810, 0xFFFE, 0xF731, 0xE73F, 0xFF9E, 0x7FE0, 0xFFD9, 0xAEDC, 0xF410, 0xE7FF, 0xFFDA, 0xD69A, 0x9772, 0xFDB8, 0xFD0F, 0x2595, 0x867F, 0x7453, 0xB63B, 0xFFFC, 0x7, 0x3666, 0xFF9C, 0xF81F, 0x8000, 0x6675, 0x19, 0xBABA, 0x939B, 0x3D8E, 0x7B5D, 0x07D3, 0x4E99, 0xC0B0, 0x18CE, 0xF7FF, 0xFF3C, 0xFF36, 0xFEF5, 0x10, 0xFFBC, 0x8400, 0x6C64, 0xFD20, 0xFA20, 0xDB9A, 0xEF55, 0x9FD3, 0xAF7D, 0xDB92, 0xFF7A, 0xFED7, 0xCC27, 0xFE19, 0xDD1B, 0xB71C, 0x8010, 0xF800, 0xBC71, 0x435C, 0x8A22, 0xFC0E, 0xF52C, 0x2C4A, 0xFFBD, 0xA285, 0xC618, 0x867D, 0x6AD9, 0x7412, 0xFFDF, 0x07EF, 0x4416, 0xD5B1, 0x410, 0xDDFB, 0xFB08, 0x471A, 0xEC1D, 0xF6F6, 0xFFFF, 0xF7BE, 0xFFE0, 0x9E66 };
 
@@ -58,35 +59,37 @@ void Menu(typeEnv *Env)
 		(*Env).FileNameForTest = Env->Menu.FileList[ActiveItem];
 	}
 
-	if(f_Action !=0)    // если нужно действие в меню (кнопка OK!)
+	if(f_Action !=0)    				// если нужно действие в меню (кнопка OK!)
 	{
 		f_Action =0;
 
-		FS_ReadFile(Env);			// прочитать выделенный файл
-		(*Env).Mode = CHECK_SCHEME;	// перейти в режим проверки схемы соединений
-		f_RefreshScreen = 1;				// перерисуй экран
+		FS_ReadFile(Env);				// прочитать выделенный файл
+		(*Env).Mode = CHECK_SCHEME;		// перейти в режим проверки схемы соединений
+		f_RefreshScreen = 1;			// перерисуй экран
 	}
 }
 
 void ChekSchem(typeEnv *Env)
 {
-	if(f_StepMenu != 0) // если вверх или вниз, направление не важно
+	uint8_t connect=0;
+
+	if(f_StepMenu != 0) 				// если вверх или вниз, направление не важно
 		{
 			f_StepMenu = 0;
-			(*Env).Mode = MENU;	// перейти в режим меню
-			f_RefreshScreen = 1;				// перерисуй экран
+			(*Env).Mode = MENU;			// перейти в режим меню
+			ST7735_Clear(BGR_COLOR);
+			f_RefreshScreen = 1;		// перерисуй экран
 		}
-	if(f_Action !=0)    // если нужно действие
+
+
+	//connect = CheckConnect(Env);
+//	if(f_Action !=0 || connect !=0)    	// если нажата ОК или обнаружено подключение
+	if(f_Action !=0 )    	// если нажата ОК
 		{
 			f_Action = 0;
-			(*Env).Mode = TEST;	// перейти в режим ТЕСТ
-			f_RefreshScreen = 1;				// перерисуй экран
+			(*Env).Mode = TEST;			// перейти в режим ТЕСТ
+			f_StartTest	= 1; 			// запустить тест сразу при переходе в состояние ТЕСТ
 		}
-
-
-	/* процедура проверки схемы*/
-
-
 }
 
 
@@ -154,9 +157,6 @@ void StepDOWN(void)
 
 void Keyboard_handler(uint8_t key)
 {
-//	char String[8]={0};
-//	sprintf(&String, "%X", key);
-//	ST7735_DrawString7x11(100,92,String,TXT_COLOR,BGR_COLOR);
 	switch(key)
 	{
 	case UP: 		StepUP(); break;
@@ -183,10 +183,5 @@ void Encoder_handler(uint16_t LastCount, uint16_t CurrCount )
 
 void ParseString(char  *str_in, char *data_out)
 {
-	uint32_t len = sizeof(str_in);
-	for(;;)
-	{
 
-
-	}
 }

@@ -76,7 +76,7 @@ int main(void)
 	FATFS	FatFs; 	//Fatfs handle
 	FRESULT resFS;
 	char status[20] = "123456";
-	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;//   / - \ |
+//	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;//   / - \ |
 	Env.Menu.ActiveItem=0;
 	Env.Menu.ActivePage=0;
 	Env.period=0;

@@ -293,6 +293,17 @@ void ST7735_DrawChar(uint8_t x,uint8_t y,uint8_t chr,uint16_t color,uint16_t bac
 	}
 }
 
+void ST7735_DrawString(uint8_t x,uint8_t y,uint8_t* chr,uint16_t color,uint16_t background_color)
+{
+	uint8_t i=0;
+	while(chr[i] != '\0')
+	{
+		ST7735_DrawChar(x+(6*i),y,chr[i],color,background_color);
+		i++;
+	}
+}
+
+
 
 void ST7735_DrawChar7x11(uint8_t x,uint8_t y,uint8_t chr,uint16_t color,uint16_t background_color)
 {

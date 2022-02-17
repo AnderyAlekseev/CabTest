@@ -8,7 +8,7 @@
 void MuxSetIN_Addr(uint8_t addr);
 void MuxSetOUT_Addr(uint8_t addr);
 void TestProsed(typeEnv *Env);
-void DrawTable(typeEnv *Env, uint8_t res);
+void DrawTable(typeEnv *Env);
 
 extern uint16_t Pulse, Period, N_periods;
 
@@ -33,7 +33,9 @@ void Test(typeEnv *Env)
 	{
 		f_StartTest = 0;
 		/* сам тест*/
+
 		TestProsed(Env);
+		f_RefreshScreen = 1;				// перерисуй экран
 
 	}
 }
@@ -46,35 +48,40 @@ void Test(typeEnv *Env)
 
 void TestProsed(typeEnv *Env)
 {
-	uint16_t X1[8][8] = {0}, X2[8][8] = {0};
-	uint16_t in_addr=0, out_addr=0, n_line=0;
-	uint16_t check=0, indx=0;
+	uint32_t X1[NCheckLine][NCheckLine] = {0};	// заданная матрица
+	uint32_t X2[NCheckLine][NCheckLine] = {0};	// результат тестирования
+	uint32_t DataAfterTest[2][NCheckLine]={0};	// результат тестирования разреженная матрица
+	uint32_t NoLineX1=0, NoLineX2=0;
+	uint32_t in_addr=0, out_addr=0, n_line=0;
+	uint32_t check=0, index=0;
+	uint32_t size=0; // количество соединённых линий, определённое в результате теста
+
 	LL_TIM_EnableIT_CC1(TIM2); // захват принятого сигнала
 
 	//LL_TIM_EnableCounter(TIM1);// генерация тестового сигнала
 	LL_TIM_ClearFlag_UPDATE(TIM4);
 	memset(X1, 0, sizeof(X1));
 	memset(X2, 0, sizeof(X2));
-	memset((*Env).CheckLine, 0 ,sizeof((*Env).CheckLine));
+//	memset((*Env).CheckLine, 0 ,sizeof((*Env).CheckLine));
 
-	for( indx=0; indx<NCheckLine; indx++)
+//	разворачиваем разреженую матрицу из конфиг файла в обычную X1
+	for( index=0; index<NCheckLine; index++)
 	{
 		uint8_t i, j;
-		i=(*Env).DataForTest[0][indx];
-		j=(*Env).DataForTest[1][indx];
+		i=(*Env).DataForTest[0][index];
+		j=(*Env).DataForTest[1][index];
 		if(i!=0 || j!=0)
 		{
-			X1[i-1][j-1]=1;
+			X1[i-1][j-1]=1;	// заданная матрица
 		}
 	}
-
+// процедура теста заполняем матрицу X2
 			for( out_addr=0; out_addr<NCheckLine; out_addr++)
 			{
 				MuxSetOUT_Addr(out_addr);	// установить номер выхода X1
 				GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
 				for( in_addr=0; in_addr<NCheckLine; in_addr++)
 				{
-
 					MuxSetIN_Addr(in_addr);	// установить номер входа X2
 					GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
 
@@ -90,82 +97,99 @@ void TestProsed(typeEnv *Env)
 					GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
 					if( N_periods == 10)
 					{
-						X2[out_addr][in_addr]=1;
+						X2[out_addr][in_addr]=1; // есть контакт
+						size++;
 					}
-
 				}
 				GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
-
 			}
+			LL_TIM_DisableIT_CC1(TIM2);
 
-			uint16_t NoLineX1=0, NoLineX2=0;
+
 			n_line = 0;
-
+			index=0;
 			for( out_addr=0; out_addr<NCheckLine; out_addr++)
 			{
-				NoLineX1=0, NoLineX2=0, check =0;
-
 					for( in_addr=0; in_addr<NCheckLine; in_addr++)
 						{
-						NoLineX1+=X1[out_addr][in_addr];  // сумма значений в столбце, если ==0, не соединений
-						NoLineX2+=X2[out_addr][in_addr];
-
-							if(X1[out_addr][in_addr] == X2[out_addr][in_addr])
+						if(X2[out_addr][in_addr] == 1)
 							{
-								check = 1;
-							}
-							else
-							{
-								check = 2;
-								break;
+								if(index < NCheckLine)
+								{
+									DataAfterTest[0][index] = out_addr+1;
+									DataAfterTest[1][index] = in_addr+1;
+									index++;
+								}
+								else
+								{
+									// линий больше чем можно обработать, т.е. есть ошибочные перекрестные соединения
+								}
 							}
 						}
 
 
-					if(NoLineX1 != 0 && NoLineX2 != 0 )
-					{
-						(*Env).CheckLine[n_line++] = check;
-					}
 			}
-
-
-
-	DrawTable(Env, 0);
-	LL_TIM_DisableIT_CC1(TIM2);
+			for(index=0; index<NCheckLine; index++)
+			{
+				if(index <= size)
+				{
+					if(			(*Env).DataForTest[0][index] == DataAfterTest[0][index] && 	\
+								(*Env).DataForTest[1][index] == DataAfterTest[1][index])
+					{
+						(*Env).CheckLine[index]=1;
+					}
+					else
+					{
+						(*Env).CheckLine[index]=2;
+					}
+				}
+			}
 
 }
 
-void DrawTable(typeEnv *Env, uint8_t res)
+
+
+
+
+void DrawTable(typeEnv *Env)
 {
 	uint8_t h=17, w=16;
 	uint8_t col=8, row=5;
-	uint8_t sx=20, ex=col*w+sx;
-	uint8_t sy=23, ey=row*h+sy;
+	uint8_t sx=Mx, ex=col*w+sx;
+	uint8_t sy=20, ey=row*h+sy;
 	uint8_t indx_col=0, indx_row=0;
 	uint8_t CHR[3]={0};
+	uint8_t X1[3]="X1";
+	uint8_t X2[3]="X2";
 	uint16_t color=0;
 	memset(CHR,0,sizeof(CHR));
-	for(indx_col=0; indx_col<=col; indx_col++)
-	{
-		ST7735_DrawVLine(sx+indx_col*w,sy,ey,TXT_COLOR);
-	}
 	for(indx_row=0;indx_row<=row;indx_row++)
 	{
 		ST7735_DrawHLine(sx,ex,sy+indx_row*h,TXT_COLOR);
 	}
+	ST7735_DrawVLine(sx,sy,sy+row*h,TXT_COLOR);
+	ST7735_DrawVLine(sx+col*w,sy,sy+row*h,TXT_COLOR);
+	for(indx_col=0; indx_col<=col; indx_col++)
+	{
+		ST7735_DrawVLine(sx+indx_col*w,sy+h,sy+4*h,TXT_COLOR);
+	}
+
+	ST7735_DrawString7x11(WIDTH/2-w/2,sy+4,X1,TXT_COLOR,BGR_COLOR);
+	ST7735_DrawString7x11(WIDTH/2-w/2,sy+4+4*h,X2,TXT_COLOR,BGR_COLOR);
 
 	for(indx_col=0; indx_col<col; indx_col++)
 	{
 		memset(CHR,0,sizeof(CHR));
 		sprintf(CHR, "%d ", (*Env).DataForTest[0][indx_col]);
-		ST7735_DrawString7x11(sx+5+indx_col*w,sy+4+h,CHR,TXT_COLOR,BGR_COLOR);
+		ST7735_DrawChar7x11(sx+5+indx_col*w,sy+4+h,CHR[0],TXT_COLOR,BGR_COLOR);
 	}
 
 	for(indx_col=0; indx_col<col; indx_col++)
 	{
 		memset(CHR,0,sizeof(CHR));
 		sprintf(CHR, "%d ", (*Env).DataForTest[1][indx_col]);
-		ST7735_DrawString7x11(sx+5+indx_col*w,sy+4+3*h,CHR,TXT_COLOR,BGR_COLOR);
+//		ST7735_DrawString7x11(sx+5+indx_col*w,sy+4+3*h,CHR,TXT_COLOR,BGR_COLOR);
+		ST7735_DrawChar7x11(sx+5+indx_col*w,sy+4+3*h,CHR[0],TXT_COLOR,BGR_COLOR);
 	}
 	for(indx_col=0; indx_col<NCheckLine; indx_col++)
 	{
@@ -183,10 +207,64 @@ void DrawTable(typeEnv *Env, uint8_t res)
 		}
 		ST7735_DrawString7x11(sx+5+indx_col*w,sy+4+2*h,"*",color,BGR_COLOR);
 	}
+	memset((*Env).CheckLine, 0 ,sizeof((*Env).CheckLine));  // очистить CheckLine до следующего теста
+
 }
 
 
+uint8_t CheckConnect(typeEnv *Env)
+{
+	uint8_t in_addr=0, out_addr=0;
+	uint32_t connect=0;
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+	// in
+	GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+	GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+	GPIO_InitStruct.Pull = LL_GPIO_PULL_DOWN;
+	LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+	  // out
+	GPIO_InitStruct.Pin = LL_GPIO_PIN_11;
+	GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+	LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+	for( out_addr=0; out_addr<NCheckLine; out_addr++)
+	{
+		MuxSetOUT_Addr(out_addr);	// установить номер выхода X1
+		GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
+		for( in_addr=0; in_addr<NCheckLine; in_addr++)
+		{
+
+			MuxSetIN_Addr(in_addr);	// установить номер входа X2
+			GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
+
+			GPIO_WriteBit(GPIOA, LL_GPIO_PIN_11, SET);// включить out
+			HAL_Delay(5);
+			connect += LL_GPIO_IsInputPinSet(GPIOA, LL_GPIO_PIN_0); //считать in
+
+			GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
+		}
+		GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
+
+	}
+	if( connect != 0)
+	{
+		// in
+			GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
+			GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+			GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+			LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
+	   // out
+			GPIO_InitStruct.Pin = LL_GPIO_PIN_11;
+			GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+			GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+			LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		return 1;
+	}
+	return 0;
+}
 
 
 
@@ -197,7 +275,7 @@ void MuxEN_OUT(uint8_t addr)
 
 void MuxEN_IN(uint8_t addr)
 {
-	LL_GPIO_ReetOutputPin(GPIOA, IN_EN_Pin);
+	LL_GPIO_ResetOutputPin(GPIOA, IN_EN_Pin);
 }
 
 void MuxSetIN_Addr(uint8_t addr)

@@ -296,7 +296,7 @@ void Flags_10msec()
 void Flags_100ms(void)
 {
 	f_100ms = 1;		// user flag every 100 ms
-	//f_EncoderRead = 1;
+	f_waitTick = 1;
 	  if (--t_sec == 0x00)
 		{
 		  t_sec = cl_sec;
