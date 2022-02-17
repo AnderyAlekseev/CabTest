@@ -15,14 +15,13 @@ extern uint16_t Pulse, Period, N_periods;
 void Test(typeEnv *Env)
 {
 	static uint8_t addr=0;
-	if(f_StepMenu != 0) // если вверх или вниз
+	if(f_StepMenu == 1 || f_connect == 0 ) // если вверх или вниз или отключен кабель
 		{
 			f_StepMenu = 0;
-			(*Env).Mode = CHECK_SCHEME;
-
+			(*Env).Mode = MODE_WAIT;
 			f_RefreshScreen = 1;				// перерисуй экран
 		}
-	if(f_Action !=0)    // если нужно действие
+	if(f_Action == 1)    // если нужно действие
 		{
 			f_Action =0;
 			f_StartTest	= 1;// запустить тест
@@ -33,7 +32,6 @@ void Test(typeEnv *Env)
 	{
 		f_StartTest = 0;
 		/* сам тест*/
-
 		TestProsed(Env);
 		f_RefreshScreen = 1;				// перерисуй экран
 
@@ -56,6 +54,8 @@ void TestProsed(typeEnv *Env)
 	uint32_t check=0, index=0;
 	uint32_t size=0; // количество соединённых линий, определённое в результате теста
 
+//	Init_Output_Input_Alter();
+
 	LL_TIM_EnableIT_CC1(TIM2); // захват принятого сигнала
 
 	//LL_TIM_EnableCounter(TIM1);// генерация тестового сигнала
@@ -75,6 +75,7 @@ void TestProsed(typeEnv *Env)
 			X1[i-1][j-1]=1;	// заданная матрица
 		}
 	}
+
 // процедура теста заполняем матрицу X2
 			for( out_addr=0; out_addr<NCheckLine; out_addr++)
 			{
@@ -144,6 +145,7 @@ void TestProsed(typeEnv *Env)
 					}
 				}
 			}
+//Init_Output_Input_GPIO();
 
 }
 
@@ -216,51 +218,36 @@ uint8_t CheckConnect(typeEnv *Env)
 {
 	uint8_t in_addr=0, out_addr=0;
 	uint32_t connect=0;
-	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
-	// in
-	GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
-	GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
-	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-	GPIO_InitStruct.Pull = LL_GPIO_PULL_DOWN;
-	LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-	  // out
-	GPIO_InitStruct.Pin = LL_GPIO_PIN_11;
-	GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-	GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-	LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
+	Init_Output_Input_GPIO();
+
+	GPIO_WriteBit(GPIOA, LL_GPIO_PIN_11, SET);// включить out
+	GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
+	GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
 	for( out_addr=0; out_addr<NCheckLine; out_addr++)
 	{
 		MuxSetOUT_Addr(out_addr);	// установить номер выхода X1
-		GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
+//		GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
 		for( in_addr=0; in_addr<NCheckLine; in_addr++)
 		{
 
 			MuxSetIN_Addr(in_addr);	// установить номер входа X2
-			GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
+//			GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
 
-			GPIO_WriteBit(GPIOA, LL_GPIO_PIN_11, SET);// включить out
-			HAL_Delay(5);
+
+			HAL_Delay(1);
 			connect += LL_GPIO_IsInputPinSet(GPIOA, LL_GPIO_PIN_0); //считать in
 
-			GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
+//			GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
 		}
-		GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
-
+//		GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
 	}
+	GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
+	GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
+	GPIO_WriteBit(GPIOA, LL_GPIO_PIN_11, RESET);// вЫключить out
 	if( connect != 0)
 	{
-		// in
-			GPIO_InitStruct.Pin = LL_GPIO_PIN_7;
-			GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-			GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-			LL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-	   // out
-			GPIO_InitStruct.Pin = LL_GPIO_PIN_11;
-			GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
-			GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-			LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+		Init_Output_Input_Alter();
 		return 1;
 	}
 	return 0;

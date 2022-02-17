@@ -1,6 +1,5 @@
-display.c:9:6:Display	24	static
-display.c:25:6:DisplayMenu	128	static
-display.c:51:6:DisplayChekSchem	16	static
-display.c:65:6:DisplayWait	64	static
-display.c:95:6:DisplayTest	56	static
-display.c:108:6:debug_LCD_print	32	static
+display.c:8:6:Display	24	static
+display.c:20:6:DisplayMenu	128	static
+display.c:47:6:DisplayWait	64	static
+display.c:77:6:DisplayTest	56	static
+display.c:90:6:debug_LCD_print	32	static

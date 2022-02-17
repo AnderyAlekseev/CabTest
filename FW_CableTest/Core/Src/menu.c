@@ -64,32 +64,31 @@ void Menu(typeEnv *Env)
 		f_Action =0;
 
 		FS_ReadFile(Env);				// прочитать выделенный файл
-		(*Env).Mode = CHECK_SCHEME;		// перейти в режим проверки схемы соединений
+		(*Env).Mode = MODE_WAIT;		// перейти в режим проверки схемы соединений
 		f_RefreshScreen = 1;			// перерисуй экран
 	}
 }
 
-void ChekSchem(typeEnv *Env)
+void Wait(typeEnv *Env)
 {
 	uint8_t connect=0;
 
 	if(f_StepMenu != 0) 				// если вверх или вниз, направление не важно
 		{
 			f_StepMenu = 0;
-			(*Env).Mode = MENU;			// перейти в режим меню
+			(*Env).Mode = MODE_MENU;			// перейти в режим меню
 			ST7735_Clear(BGR_COLOR);
 			f_RefreshScreen = 1;		// перерисуй экран
 		}
 
 
-	//connect = CheckConnect(Env);
-//	if(f_Action !=0 || connect !=0)    	// если нажата ОК или обнаружено подключение
-	if(f_Action !=0 )    	// если нажата ОК
+	if(f_Action == 1 || f_connect ==1 )    	// если нажата ОК или подключен кабель
 		{
 			f_Action = 0;
-			(*Env).Mode = TEST;			// перейти в режим ТЕСТ
+			(*Env).Mode = MODE_TEST;			// перейти в режим ТЕСТ
 			f_StartTest	= 1; 			// запустить тест сразу при переходе в состояние ТЕСТ
 		}
+
 }
 
 

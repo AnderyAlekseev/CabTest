@@ -7,10 +7,10 @@ stm32f1xx_ll_tim.h:3239:22:LL_TIM_DisableIT_CC1	16	static
 stm32f1xx_ll_gpio.h:723:26:LL_GPIO_IsInputPinSet	16	static
 stm32f1xx_ll_gpio.h:833:22:LL_GPIO_ResetOutputPin	16	static
 test.c:15:6:Test	16	static
-test.c:49:6:TestProsed	632	static
-test.c:154:6:DrawTable	48	static
-test.c:215:9:CheckConnect	48	static
-test.c:271:6:MuxEN_OUT	16	static
-test.c:276:6:MuxEN_IN	16	static
-test.c:281:6:MuxSetIN_Addr	24	static
-test.c:293:6:MuxSetOUT_Addr	24	static
+test.c:47:6:TestProsed	632	static
+test.c:156:6:DrawTable	48	static
+test.c:217:9:CheckConnect	24	static
+test.c:258:6:MuxEN_OUT	16	static
+test.c:263:6:MuxEN_IN	16	static
+test.c:268:6:MuxSetIN_Addr	24	static
+test.c:280:6:MuxSetOUT_Addr	24	static

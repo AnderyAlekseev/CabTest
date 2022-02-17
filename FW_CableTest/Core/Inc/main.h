@@ -74,10 +74,10 @@ extern "C" {
 #define    DANGER_BGR_COLOR	COLOR565_RED//
 
 /*	 режимы работы (состояния прибора)*/
-#define MENU			1	// отображение и навигация по меню
-#define CHECK_SCHEME	2	// отображение схемы проверки из файла перед запуском теста
-#define TEST			3	// тест - НЕ ПРЕДУСМОТРЕН ОТКЛ�?К НА КЛАВ�?АТУРУ
-#define RESULT			4	//
+#define MODE_MENU		1	// отображение и навигация по меню
+#define MODE_WAIT		2	// ОЖИДАНИЕ ПОДКЛЮЧЕНИЯ КАБЕЛЯ, отображение схемы проверки из файла перед запуском теста
+#define MODE_TEST		3	// тест - при отключении кабеля переходит в MODE_WAIT
+
 /* коды нажатия кнопок*/
 #define UP		0x0B
 #define DOWN	0x0E
@@ -87,10 +87,6 @@ extern "C" {
 /*Координаты для строки сообщений*/
 #define Mx 15
 #define My 112
-/* ПАРАМЕТРЫ ЧТЕН�?Я Д�?РЕКТОР�?�? SD карты
- * используется в  FS_GetFileList()*/
-//#define FS_ALL_DIR		1		// читать все файлы, чтобы узнать количество всех файлов
-//#define FS_ONE_PAGE		2		// читать только для одной страницы меню, чтобы заполнить список названиями файлов
 
 /* USER CODE END Includes */
 
@@ -150,7 +146,7 @@ void Error_Handler(void);
 void ReadKeyPad(void);
 void Result(typeEnv *Env);
 void Test(typeEnv *Env);
-void ChekSchem(typeEnv *Env);
+void Wait(typeEnv *Env);
 void Menu(typeEnv *Env);
 void Display(typeEnv *Env);
 /* USER CODE END EFP */
@@ -214,7 +210,7 @@ extern  uint32_t FLAG;
 #define f_DirStepMenu		BBAdr(FLAG,9)
 #define f_Action			BBAdr(FLAG,10)
 #define f_StartTest			BBAdr(FLAG,11)
-
+#define f_connect			BBAdr(FLAG,12)
 
 /**
    * @param  GPIOx GPIO Port
@@ -239,7 +235,8 @@ extern  uint32_t FLAG;
   * @retval None
   */
 void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin, uint8_t BitVal);
-
+void Init_Output_Input_GPIO();
+void Init_Output_Input_Alter();
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

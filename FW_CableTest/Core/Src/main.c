@@ -81,7 +81,7 @@ int main(void)
 	Env.Menu.ActivePage=0;
 	Env.period=0;
 	Env.pulse=0;
-	Env.Mode = MENU;
+	Env.Mode = MODE_MENU;
 	uint8_t mode = Env.Mode;
 	f_RefreshScreen = 1;
   /* USER CODE END 1 */
@@ -130,7 +130,7 @@ int main(void)
 
 	LL_TIM_EnableCounter(TIM1);
 //	LL_TIM_EnableCounter(TIM4);
-	HAL_Delay(500);
+	HAL_Delay(20);
 	LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS
 	resFS = f_mount(&FatFs, "", 1); //Монтируем файловую систему до первого использования SPI дисплеем
 
@@ -161,17 +161,22 @@ int main(void)
 	ST7735_Clear(BGR_COLOR);
 	FS_GetFileList( &Env);
 	Env.Menu.NmbrAllPages = (uint32_t)(Env.Menu.NmbrAllFiles/ITEM_ON_PAGE_MAX);
+
+	// Init_Output_Input_GPIO();
+
   while (1)
   {
+	 DWT_CYCCNT = 0;// обнуляем значение
+	f_connect = CheckConnect(Env);
+	count_tic = DWT_CYCCNT;//смотрим сколько натикало
 	ReadKeyPad();
 	mode = Env.Mode;
 	switch(mode)	// назначить действие в зависимости от текущего режима
 			{
-				case MENU: 			Menu(&Env); 		break;
-				case CHECK_SCHEME: 	ChekSchem(&Env);  	break;
-				case TEST: 			Test(&Env);			break;
-				case RESULT: 		Result(&Env);		break;
-					default: break;
+				case MODE_MENU: 	Menu(&Env); 	break;
+				case MODE_WAIT: 	Wait(&Env);  	break;
+				case MODE_TEST: 	Test(&Env);		break;
+				default: break;
 			}
 	Display(&Env);
 

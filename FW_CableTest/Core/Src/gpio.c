@@ -128,7 +128,51 @@ void MX_GPIO_Init(void)
 
 }
 
+
+
 /* USER CODE BEGIN 2 */
+
+void Init_Output_Input_Alter()
+{
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+	// in
+		GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+		GPIO_InitStruct.Mode = LL_GPIO_MODE_FLOATING;
+	//	GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+		LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+   // out
+		GPIO_InitStruct.Pin = LL_GPIO_PIN_11;
+		GPIO_InitStruct.Mode = LL_GPIO_MODE_ALTERNATE;
+		  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+		  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+		LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+
+
+void Init_Output_Input_GPIO()
+{
+	LL_GPIO_InitTypeDef GPIO_InitStruct = {0};
+
+	LL_GPIO_ResetOutputPin(GPIOA, LL_GPIO_PIN_11);
+	// in
+		GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
+		GPIO_InitStruct.Mode = LL_GPIO_MODE_INPUT;
+		//GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+		LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+   // out
+		GPIO_InitStruct.Pin = LL_GPIO_PIN_11;
+		GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+		GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+		GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+		LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+}
+/*
+ *  GPIO_InitStruct.Pin = OUT_A_Pin|OUT_B_Pin|OUT_C_Pin|OUT_EN_Pin;
+  GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
+  GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
+  LL_GPIO_Init(GPIOB, &GPIO_InitStruct);*/
+
 void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin, uint8_t BitVal)
 {
 	/*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
