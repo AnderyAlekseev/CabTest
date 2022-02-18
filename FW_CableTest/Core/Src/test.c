@@ -10,7 +10,7 @@ void MuxSetOUT_Addr(uint8_t addr);
 void TestProsed(typeEnv *Env);
 void DrawTable(typeEnv *Env);
 
-extern uint16_t Pulse, Period, N_periods;
+extern uint32_t Pulse, Period, N_periods;
 
 void Test(typeEnv *Env)
 {
@@ -56,7 +56,7 @@ void TestProsed(typeEnv *Env)
 
 //	Init_Output_Input_Alter();
 
-	LL_TIM_EnableIT_CC1(TIM2); // захват принятого сигнала
+	LL_TIM_EnableIT_CC1(TIM2); // назначить прерывание по захвату принятого сигнала
 
 	//LL_TIM_EnableCounter(TIM1);// генерация тестового сигнала
 	LL_TIM_ClearFlag_UPDATE(TIM4);
@@ -105,8 +105,9 @@ void TestProsed(typeEnv *Env)
 				GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
 			}
 			LL_TIM_DisableIT_CC1(TIM2);
-
-
+// X2 заполнили
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+// заполняем разреженную матрицу соединений после теста
 			n_line = 0;
 			index=0;
 			for( out_addr=0; out_addr<NCheckLine; out_addr++)
@@ -127,9 +128,10 @@ void TestProsed(typeEnv *Env)
 								}
 							}
 						}
-
-
 			}
+// разреженая матрица заполнена
+//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 			for(index=0; index<NCheckLine; index++)
 			{
 				if(index <= size)

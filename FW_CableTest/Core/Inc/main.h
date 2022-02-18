@@ -75,7 +75,7 @@ extern "C" {
 
 /*	 режимы работы (состояния прибора)*/
 #define MODE_MENU		1	// отображение и навигация по меню
-#define MODE_WAIT		2	// ОЖИДАНИЕ ПОДКЛЮЧЕНИЯ КАБЕЛЯ, отображение схемы проверки из файла перед запуском теста
+#define MODE_WAIT		2	// ОЖ�?ДАН�?Е ПОДКЛЮЧЕН�?Я КАБЕЛЯ, отображение схемы проверки из файла перед запуском теста
 #define MODE_TEST		3	// тест - при отключении кабеля переходит в MODE_WAIT
 
 /* коды нажатия кнопок*/
@@ -149,6 +149,11 @@ void Test(typeEnv *Env);
 void Wait(typeEnv *Env);
 void Menu(typeEnv *Env);
 void Display(typeEnv *Env);
+void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin, uint8_t BitVal);
+void Init_Output_Input_GPIO();
+void Init_Output_Input_Alter();
+
+extern uint32_t Pulse, Period, N_periods;
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -234,9 +239,7 @@ extern  uint32_t FLAG;
   *         @arg @ref LL_GPIO_PIN_ALL
   * @retval None
   */
-void GPIO_WriteBit(GPIO_TypeDef* GPIOx, uint32_t GPIO_Pin, uint8_t BitVal);
-void Init_Output_Input_GPIO();
-void Init_Output_Input_Alter();
+
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

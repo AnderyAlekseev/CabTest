@@ -114,21 +114,7 @@ void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = LL_GPIO_PULL_UP;
   LL_GPIO_Init(BUTTON_GPIO_Port, &GPIO_InitStruct);
 
-
-  //проверка PA00
-//   GPIO_InitStruct.Pin = LL_GPIO_PIN_0;
-//   GPIO_InitStruct.Mode = LL_GPIO_MODE_OUTPUT;
-//   GPIO_InitStruct.Speed = LL_GPIO_SPEED_FREQ_LOW;
-//   GPIO_InitStruct.OutputType = LL_GPIO_OUTPUT_PUSHPULL;
-//   LL_GPIO_Init(GPIOA, &GPIO_InitStruct);
-//   for(uint8_t indx=0; indx<20; indx++)
-//   {
-//	   LL_GPIO_TogglePin(GPIOA, LL_GPIO_PIN_0);
-//   }
-
 }
-
-
 
 /* USER CODE BEGIN 2 */
 

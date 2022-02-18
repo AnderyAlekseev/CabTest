@@ -51,7 +51,7 @@ uint32_t count_tic = 0; // счётчик тиков для подсчёта в�
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-uint16_t Pulse=0, Period=0, N_periods=0;
+uint32_t Pulse=0, Period=0, N_periods=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -116,21 +116,16 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_4, LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinPull(GPIOB, LL_GPIO_PIN_4, LL_GPIO_PULL_UP);
-	LL_GPIO_SetPinMode(GPIOB, LL_GPIO_PIN_5, LL_GPIO_MODE_INPUT);
-	LL_GPIO_SetPinPull(GPIOB, LL_GPIO_PIN_5, LL_GPIO_PULL_UP);
-	LL_TIM_SetCounter(TIM3, 0x7fff);
-	LL_GPIO_AF_RemapPartial_TIM3();
-	LL_TIM_EnableCounter(TIM3);
 	LL_TIM_CC_EnableChannel(TIM1, LL_TIM_CHANNEL_CH4);
 	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH1);
-//	LL_TIM_CC_EnableChannel(TIM2, LL_TIM_CHANNEL_CH2);
+	LL_TIM_CC_EnableChannel(TIM3, LL_TIM_CHANNEL_CH1);
 	LL_TIM_CC_EnableChannel(TIM4, LL_TIM_CHANNEL_CH2);
-
 	LL_TIM_EnableCounter(TIM1);
-//	LL_TIM_EnableCounter(TIM4);
-	HAL_Delay(20);
+
+//	LL_TIM_EnableCounter(TIM3);
+//	HAL_Delay(500);
+//	LL_TIM_DisableCounter(TIM3);
+
 	LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS
 	resFS = f_mount(&FatFs, "", 1); //Монтируем файловую систему до первого использования SPI дисплеем
 
@@ -159,11 +154,12 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	ST7735_Clear(BGR_COLOR);
+	HAL_Delay(500);
 	FS_GetFileList( &Env);
 	Env.Menu.NmbrAllPages = (uint32_t)(Env.Menu.NmbrAllFiles/ITEM_ON_PAGE_MAX);
 
 	// Init_Output_Input_GPIO();
-
+/* PB4 - выход на зуммер*/
   while (1)
   {
 	 DWT_CYCCNT = 0;// обнуляем значение

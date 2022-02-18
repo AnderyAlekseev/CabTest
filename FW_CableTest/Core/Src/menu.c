@@ -133,12 +133,13 @@ void ReadKeyPad(void)
 			Keyboard_handler(key);		// обработка нажатия после отпускания
 			but_press=0;
 			key=0;
+
 		}
-		else if(CurrEncCount != LastEncCount)
-		{
-			Encoder_handler(LastEncCount, CurrEncCount );		// обработка поворота энкодера
-			LastEncCount = CurrEncCount;
-		}
+//		else if(CurrEncCount != LastEncCount)
+//		{
+//			Encoder_handler(LastEncCount, CurrEncCount );		// обработка поворота энкодера
+//			LastEncCount = CurrEncCount;
+//		}
 	}
 }
 
