@@ -9,6 +9,7 @@ void MuxSetIN_Addr(uint8_t addr);
 void MuxSetOUT_Addr(uint8_t addr);
 void TestProsed(typeEnv *Env);
 void DrawTable(typeEnv *Env);
+void Sound(uint32_t freq);
 
 extern uint32_t Pulse, Period, N_periods;
 
@@ -62,6 +63,7 @@ void TestProsed(typeEnv *Env)
 	LL_TIM_ClearFlag_UPDATE(TIM4);
 	memset(X1, 0, sizeof(X1));
 	memset(X2, 0, sizeof(X2));
+	f_failtest=0;
 //	memset((*Env).CheckLine, 0 ,sizeof((*Env).CheckLine));
 
 //	разворачиваем разреженую матрицу из конфиг файла в обычную X1
@@ -144,8 +146,16 @@ void TestProsed(typeEnv *Env)
 					else
 					{
 						(*Env).CheckLine[index]=2;
+						f_failtest=1;
 					}
 				}
+			}
+			if(f_failtest == 1)
+			{
+				f_failtest=0;
+				Sound(4000);
+			}else{
+				Sound(250);
 			}
 //Init_Output_Input_GPIO();
 
@@ -255,7 +265,12 @@ uint8_t CheckConnect(typeEnv *Env)
 	return 0;
 }
 
-
+void Sound(uint32_t freq)
+{
+	LL_TIM_SetAutoReload(TIM3, freq*2);
+	LL_TIM_EnableCounter(TIM3);
+	f_sound = 1;
+}
 
 void MuxEN_OUT(uint8_t addr)
 {

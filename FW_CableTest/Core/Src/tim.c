@@ -111,16 +111,10 @@ void MX_TIM2_Init(void)
   LL_TIM_DisableARRPreload(TIM2);
   LL_TIM_SetTriggerOutput(TIM2, LL_TIM_TRGO_RESET);
   LL_TIM_DisableMasterSlaveMode(TIM2);
-
   LL_TIM_IC_SetActiveInput(TIM2, LL_TIM_CHANNEL_CH1, LL_TIM_ACTIVEINPUT_DIRECTTI);
   LL_TIM_IC_SetPrescaler(TIM2, LL_TIM_CHANNEL_CH1, LL_TIM_ICPSC_DIV1);
   LL_TIM_IC_SetFilter(TIM2, LL_TIM_CHANNEL_CH1, LL_TIM_IC_FILTER_FDIV1);
-  LL_TIM_IC_SetPolarity(TIM2, LL_TIM_CHANNEL_CH1,  LL_TIM_IC_POLARITY_FALLING );//LL_TIM_IC_POLARITY_RISING
-
-  LL_TIM_IC_SetActiveInput(TIM2, LL_TIM_CHANNEL_CH2, LL_TIM_ACTIVEINPUT_INDIRECTTI);
-  LL_TIM_IC_SetPrescaler(TIM2, LL_TIM_CHANNEL_CH2, LL_TIM_ICPSC_DIV1);
-  LL_TIM_IC_SetFilter(TIM2, LL_TIM_CHANNEL_CH2, LL_TIM_IC_FILTER_FDIV1);
-  LL_TIM_IC_SetPolarity(TIM2, LL_TIM_CHANNEL_CH2, LL_TIM_IC_POLARITY_FALLING);
+  LL_TIM_IC_SetPolarity(TIM2, LL_TIM_CHANNEL_CH1, LL_TIM_IC_POLARITY_FALLING);
 
 }
 /* TIM3 init function */
@@ -138,10 +132,9 @@ void MX_TIM3_Init(void)
   TIM_InitStruct.Autoreload = 499;
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   LL_TIM_Init(TIM3, &TIM_InitStruct);
-  LL_TIM_DisableARRPreload(TIM3);
-  LL_TIM_OC_EnablePreload(TIM3, LL_TIM_CHANNEL_CH1);
+  LL_TIM_EnableARRPreload(TIM3);
   TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_TOGGLE;
-  TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_ENABLE;
+  TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.CompareValue = 0;
   TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
@@ -178,21 +171,22 @@ void MX_TIM4_Init(void)
 
   TIM_InitStruct.Prescaler = 71;
   TIM_InitStruct.CounterMode = LL_TIM_COUNTERMODE_UP;
-  TIM_InitStruct.Autoreload = 99;
+  TIM_InitStruct.Autoreload = 199;
   TIM_InitStruct.ClockDivision = LL_TIM_CLOCKDIVISION_DIV1;
   LL_TIM_Init(TIM4, &TIM_InitStruct);
-  LL_TIM_DisableARRPreload(TIM4);
+  LL_TIM_EnableARRPreload(TIM4);
   LL_TIM_OC_EnablePreload(TIM4, LL_TIM_CHANNEL_CH2);
   TIM_OC_InitStruct.OCMode = LL_TIM_OCMODE_PWM1;
   TIM_OC_InitStruct.OCState = LL_TIM_OCSTATE_DISABLE;
   TIM_OC_InitStruct.OCNState = LL_TIM_OCSTATE_DISABLE;
-  TIM_OC_InitStruct.CompareValue = 10;
-  TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_LOW;
+  TIM_OC_InitStruct.CompareValue = 1;
+  TIM_OC_InitStruct.OCPolarity = LL_TIM_OCPOLARITY_HIGH;
   LL_TIM_OC_Init(TIM4, LL_TIM_CHANNEL_CH2, &TIM_OC_InitStruct);
   LL_TIM_OC_DisableFast(TIM4, LL_TIM_CHANNEL_CH2);
   LL_TIM_SetOnePulseMode(TIM4, LL_TIM_ONEPULSEMODE_SINGLE);
-  LL_TIM_SetTriggerOutput(TIM4, LL_TIM_TRGO_OC2REF);
+  LL_TIM_SetTriggerOutput(TIM4, LL_TIM_TRGO_ENABLE);
   LL_TIM_EnableMasterSlaveMode(TIM4);
+  LL_TIM_OC_DisablePreload(TIM4, LL_TIM_CHANNEL_CH2);
   LL_APB2_GRP1_EnableClock(LL_APB2_GRP1_PERIPH_GPIOB);
     /**TIM4 GPIO Configuration
     PB7     ------> TIM4_CH2

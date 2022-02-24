@@ -154,10 +154,10 @@ int main(void)
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	ST7735_Clear(BGR_COLOR);
-	HAL_Delay(500);
+	HAL_Delay(100);
 	FS_GetFileList( &Env);
 	Env.Menu.NmbrAllPages = (uint32_t)(Env.Menu.NmbrAllFiles/ITEM_ON_PAGE_MAX);
-
+    Env.FileNameForTest = Env.Menu.FileList[0];
 	// Init_Output_Input_GPIO();
 /* PB4 - выход на зуммер*/
   while (1)

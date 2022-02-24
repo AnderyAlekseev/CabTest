@@ -37,6 +37,7 @@
 #define cl_ms100        10	// 10 раз по 10 мсек
 #define cl_sec          10	// 10 раз по 100 мсек
 #define cl_min          60	// 60 раз по 1 сек
+#define cl_sound		2	// cl_sound x t_sound - - длительность звукового сигнала
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -50,7 +51,7 @@ uint16_t    t_10ms      = cl_ms10;
 uint16_t    t_100ms     = cl_ms100;
 uint16_t    t_sec       = cl_sec;
 uint16_t    t_min       = cl_min;
-
+uint16_t    t_sound		= cl_sound;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -296,7 +297,18 @@ void Flags_100ms(void)
 {
 	f_100ms = 1;		// user flag every 100 ms
 	f_waitTick = 1;
-	  if (--t_sec == 0x00)
+//------	таймер длительности звукового сигнала
+	if(f_sound == 1)
+		{
+			if(--t_sound == 0)
+			{
+				LL_TIM_DisableCounter(TIM3);
+				f_sound=0;
+				t_sound = cl_sound; //t_sound x 100ms
+			}
+		}
+//------	Таймер 1 секунды	---
+	if (--t_sec == 0x00)
 		{
 		  t_sec = cl_sec;
 		  Flags_1s();

@@ -5,9 +5,11 @@ core_cm3.h:1686:26:NVIC_EncodePriority	40	static
 stm32f1xx_ll_bus.h:447:22:LL_APB1_GRP1_EnableClock	24	static
 stm32f1xx_ll_bus.h:763:22:LL_APB2_GRP1_EnableClock	24	static
 stm32f1xx_ll_tim.h:1111:22:LL_TIM_SetOnePulseMode	16	static
+stm32f1xx_ll_tim.h:1179:22:LL_TIM_EnableARRPreload	16	static
 stm32f1xx_ll_tim.h:1190:22:LL_TIM_DisableARRPreload	16	static
 stm32f1xx_ll_tim.h:1787:22:LL_TIM_OC_DisableFast	24	static
 stm32f1xx_ll_tim.h:1831:22:LL_TIM_OC_EnablePreload	24	static
+stm32f1xx_ll_tim.h:1852:22:LL_TIM_OC_DisablePreload	24	static
 stm32f1xx_ll_tim.h:2146:22:LL_TIM_IC_SetActiveInput	32	static
 stm32f1xx_ll_tim.h:2196:22:LL_TIM_IC_SetPrescaler	32	static
 stm32f1xx_ll_tim.h:2259:22:LL_TIM_IC_SetFilter	32	static
@@ -22,5 +24,5 @@ stm32f1xx_ll_tim.h:3675:22:LL_TIM_DisableDMAReq_TRIG	16	static
 stm32f1xx_ll_gpio.h:1137:22:LL_GPIO_AF_RemapPartial_TIM3	4	static
 tim.c:28:6:MX_TIM1_Init	104	static
 tim.c:85:6:MX_TIM2_Init	48	static
-tim.c:127:6:MX_TIM3_Init	80	static
-tim.c:166:6:MX_TIM4_Init	80	static
+tim.c:121:6:MX_TIM3_Init	80	static
+tim.c:159:6:MX_TIM4_Init	80	static

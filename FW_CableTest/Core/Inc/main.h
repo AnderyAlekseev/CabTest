@@ -216,6 +216,8 @@ extern  uint32_t FLAG;
 #define f_Action			BBAdr(FLAG,10)
 #define f_StartTest			BBAdr(FLAG,11)
 #define f_connect			BBAdr(FLAG,12)
+#define f_failtest			BBAdr(FLAG,13)
+#define f_sound				BBAdr(FLAG,14)
 
 /**
    * @param  GPIOx GPIO Port
