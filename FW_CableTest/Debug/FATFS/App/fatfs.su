@@ -1,4 +1,6 @@
 fatfs.c:33:6:MX_FATFS_Init	8	static
 fatfs.c:48:7:get_fattime	4	static
-fatfs.c:60:9:FS_GetFileList	616	static
-fatfs.c:100:9:FS_ReadFile	1536	static
+fatfs.c:57:9:FS_GetFileList	616	static
+fatfs.c:99:9:FS_Read_JSON_File	16	static
+fatfs.c:178:9:FS_ReadCSVFile	592	static
+fatfs.c:216:9:FS_ReadFile	1536	static

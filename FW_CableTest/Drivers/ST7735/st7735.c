@@ -160,6 +160,7 @@ void HAL_ST7735_Init(void)
 
 
 
+
 void ST7735_AddrSet(uint16_t XS, uint16_t YS, uint16_t XE, uint16_t YE)
 {
   ST7735_SendCmd(ST7735_CASET); // Column address set
@@ -181,10 +182,6 @@ void ST7735_AddrSet(uint16_t XS, uint16_t YS, uint16_t XE, uint16_t YE)
 
 void ST7735_Clear(uint16_t Color)
 {
-	//ST7735_AddrSet(0,0,128,160);
-	//	A0_HIGH;
-	//	ST7735_Send(Color);
-
 
 	uint16_t i;
 	uint8_t CL,CH;
@@ -541,13 +538,7 @@ void ST7735_ListBox_Draw(ST7735_ListBox* lb)
 	SCL = lb->SelectedItemColor & 0xFF;
 	SCH = (lb->SelectedItemColor>>8) & 0xFF;
 	A0_HIGH_ST7735;
-	/*for (i=0;i<tmp;i++)	// заливка фона идёт очень долго; заметны мерцания
-	{
-		ST7735_Send(BCH);
-		ST7735_Send(BCL);
-	}*/
 	
-	//item = 0;
 	for(i=0;i<lb->items_count;i++)
 	{
 		if(lb->items[i].visible == 1)
@@ -556,16 +547,7 @@ void ST7735_ListBox_Draw(ST7735_ListBox* lb)
 			uint16_t ty = lb->y + (LINE_HEIGTH*i)+5;
 			if(lb->items[i].selected)
 			{
-				/*uint16_t colored,j;
-				ST7735_AddrSet(lb->x+3,ty,lb->x+lb->w-3,ty+11);
-				colored = (lb->w-3)*LINE_HEIGTH;
-				A0_HIGH_ST7735;
-				for(j = 0;j<colored;j++)
-				{
-					ST7735_Send(SCH);
-					ST7735_Send(SCL);
-				}*/
-				BGCol = lb->SelectedItemColor;
+			 BGCol = lb->SelectedItemColor;
 			}
 			ST7735_DrawNString7x11(lb->x+9,ty,(uint8_t *)lb->items[i].text,lb->ItemTextColor,BGCol, FILENAME_SIZE);
 		}
@@ -605,20 +587,10 @@ ST7735_ListBox_Item ST7735_ListBox_GetSelectedItem(ST7735_ListBox* lb)
 
 void ST7735_ListBox_StructInit(ST7735_ListBox* lb,uint8_t x,uint8_t y,ST7735_ListBox_Item* items,uint8_t item_count)
 {
-	/*FileList.BackgroundColor=COLOR565_DODGER_BLUE;
-	FileList.BorderColor=COLOR565_DARK_SLATE_BLUE;
-	FileList.SelectedItemColor=COLOR565_BLANCHED_ALMOND;
-	FileList.ItemTextColor=COLOR565_TEAL;*/
-	//lb->BackgroundColor = COLOR565_CRIMSON;
-	//lb->BorderColor = COLOR565_ALICE_BLUE;
 	lb->items = items;
 	lb->items_count = item_count;
-	//lb->ItemTextColor = COLOR565_ALICE_BLUE;
-	//lb->SelectedItemColor = COLOR565_DARK_BLUE;
 	lb->SelectedItemIndex = 0;
-	//lb->w = 75;
 	lb->w = WIDTH;
-	//lb->w = FILENAME_SIZE*8;
 	lb->h = item_count *LINE_HEIGTH+7;
 	lb->x = x;
 	lb->y = y;///////////////смещение вниз от верхнего края на 15 пикселей

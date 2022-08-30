@@ -3,6 +3,7 @@
 	<name>FW_CableTest</name>
 	<comment></comment>
 	<projects>
+		<project>FW_CableTest</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>

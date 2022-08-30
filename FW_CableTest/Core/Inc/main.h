@@ -44,20 +44,31 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
 #include "st7735.h"
 #include "font5x7.h"
 #include "font7x11.h"
 #include "color565.h"
 #include "ff.h"
+//#include "../../lv_conf.h"
+//#include "../../lvgl/lvgl.h"
 
-#define NLin 32	// максимальное количество тестируемых линий
-#define NCheckLine 8	// количество тестируемых линий
+#define pinMAX	(uint32_t)26		// максимальное количество выводов на одном разъеме девайса
+#define lineMAX 	pinMAX*2		// максимально возможное количество тестируемых линий. Возьмем с запасом в два раза. Если обнаружатся перекрестные соединения и будет более 52 линий, это уже обнаруженная ошибка. Всего выводов будет 2х26=52, если считать все перекрёстные соединения получится 52х52 = 2704 линии!!!! нет смысла их все обнаруживать и анализировать!
 
-#define FILENAME_SIZE 		(uint8_t)13  								// максимальная длина имени файла для списка
-#define DATA_TEST_SIZE  	(uint8_t)255								// длина строки с данными из файла
-#define ITEM_ON_PAGE_MAX 	(uint8_t)9	//11									// максимальное количество строк на странице меню
-#define PAGE_MAX			(uint8_t)(FILELIST_MAX/ITEM_ON_PAGE_MAX)	// максимальное количество страниц меню
+//////////////////////////////
+#define NLin 32				// максимальное количество тестируемых линий
+#define NCheckLine 8		// количество тестируемых линий
+//////////////////////////////
 
+#define FILE_SIZE 			(uint32_t)1000								// длина строки с данными из файла (размер файла )
+#define FILENAME_SIZE 		(uint32_t)13 								// максимальная длина имени файла для списка
+#define DATA_TEST_SIZE  	(uint32_t)255								// длина строки с данными из файла
+#define ITEM_ON_PAGE_MAX 	(uint32_t)9	//11							// максимальное количество строк на странице меню
+#define PAGE_MAX			(uint32_t)(FILELIST_MAX/ITEM_ON_PAGE_MAX)	// максимальное количество страниц меню
+#define KEY_LENGHT			(uint32_t)16									// МАКСИМАЛЬНАЯ ДЛИНА СТРОКИ С НАЗВАНИЕМ КЛЮЧА В JSON ОБЪЕКТЕ
+
+//#define FS_EOF		1	// конец файла
 /* для парсинга данных из файла
  * обозначение для начала и окончания фрагмента с данными.
  * */
@@ -92,6 +103,7 @@ extern "C" {
 
 /* Exported types ------------------------------------------------------------*/
 /* USER CODE BEGIN ET */
+
 typedef struct typeMenu{
 	char		FileList[ITEM_ON_PAGE_MAX][FILENAME_SIZE];
 	char	 	ActiveFileName;
@@ -105,17 +117,88 @@ typedef struct typeMenu{
 }typeMenu;
 
 
+
+/*********************************************
+ * 	точка подключения описывается именем разъёма
+ * 	и номером вывода на этом разъёме
+ * 	пример: 12 вывод на разъёме ХР23 -
+ *
+ * 	typePoint BeginPoint.name = "XP23"
+ * 	typePoint BeginPoint.num = "12"
+ *
+ * ************************/
 typedef struct {
-	typeMenu Menu;
-	char Status;
-	char *FileNameForTest;
-	uint8_t Mode;
-	uint32_t DataForTest[2][NLin];
-	uint8_t CheckLine[NCheckLine];
-	uint8_t RealDataSize;
+		char *name;
+		char *num;
+}t_Point;
+
+
+/****************************************************************
+ * 	Проводник описывается двуми точками: начало и конец
+ * 	Пример: XP23.12 -> XS12.9
+ * 		typeWire FirstWire.begin.name = "X1";
+ * 		typeWire FirstWire.begin.num  = 11;
+ * 		typeWire FirstWire.end.name   = "X1";
+ * 		typeWire FirstWire.end.num    = 2;
+ *
+ * *******************/
+typedef struct {
+	t_Point begin;
+	t_Point end;
+}t_Wire;
+
+
+/****************************************************************
+ * 	Линия состоит из проводника адаптера и проводника кабеля
+ * 	Пример: Есть массив из 8 линий typeLine Lines[8] = {0};
+ * 	первая линия: (запись в последовательности прохождения сигнала)
+ *
+ * 				 Lines[0].adapter.begin.name = "X1"; - поступает на X1.1 адаптера (выходит с одноимённого вывода на девайсе)
+ * 				 Lines[0].adapter.begin.num  = 1;
+ * 				 Lines[0].cabel.begin.name   = "X4"; - поступает на X4.1 кабеля (выходит с адаптера)проходит через кабель
+ * 				 Lines[0].cabel.begin.num    = 1;
+ * 				 Lines[0].cabel.end.name     = "X3"; - и возвращается с разъема кабеля X3.4, проходит через адаптер
+ * 				 Lines[0].cabel.end.num      = 4;
+ * 				 Lines[0].adapter.end.name   = "X1"; - и выходит с адаптера на X1.5 (одноимённый вывод девайса)
+ * 				 Lines[0].adapter.end.num    = 5;
+ *________  ____________      __________
+ *device  | | adapter 	|	 | cabel    |
+*  X1.1-->|-|X1.1---->--|->--|-X4.1		|--->---
+*		  | |X1.2		|	 |__________|		|
+*		  | |X1.3       |     __________		|
+*		  | |X1.4    	|	 |cabel     |		|
+*  X1.5-<-|-|X1.5----<--|-<--|-X3.4 	|---<---
+*_________| |___________|	 |__________|
+ * *********************/
+typedef struct {
+	uint32_t numLine;
+	t_Wire adapter;
+	t_Wire cabel;
+}t_Line;
+
+
+
+
+typedef struct {
+	typeMenu 	Menu;
+	t_Line 	    Lines[lineMAX] ;
+	char 		Status[24];
+	char *		FileNameForTest;
+	char 		CSVBuf[FILE_SIZE];   // строка прочитанная из файла ;
+
+	uint8_t 	Mode;
+	uint32_t	DataForTest[2][NLin];
+	uint8_t 	CheckLine[NCheckLine];
+	uint8_t 	RealDataSize;
 	uint16_t	period;
 	uint16_t	pulse;
+
 }typeEnv;
+
+
+//--------------------------------------------
+
+
 
 
 
@@ -129,8 +212,8 @@ typedef struct {
 
 /* Exported macro ------------------------------------------------------------*/
 /* USER CODE BEGIN EM */
-#define str(x) #x
-#define xstr(x) str(x)
+//#define str(x) #x
+//#define xstr(x) str(x)
 
 // измерение времени выполнения куска кода в машинных тиках
 #define    DWT_CYCCNT    *(volatile unsigned long *)0xE0001004
@@ -143,6 +226,8 @@ extern uint32_t count_tic;
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
+void LineStructInit(typeEnv *Env);
+//void ParseJsonBuf(typeEnv *Env);
 void ReadKeyPad(void);
 void Result(typeEnv *Env);
 void Test(typeEnv *Env);
@@ -154,6 +239,12 @@ void Init_Output_Input_GPIO();
 void Init_Output_Input_Alter();
 
 extern uint32_t Pulse, Period, N_periods;
+
+
+//extern lv_disp_draw_buf_t  lvgl_disp_buf;
+
+
+
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/

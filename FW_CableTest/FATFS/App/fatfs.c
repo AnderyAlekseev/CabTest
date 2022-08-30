@@ -24,8 +24,8 @@ FATFS USERFatFS;    /* File system object for USER logical drive */
 FIL USERFile;       /* File object for USER */
 
 /* USER CODE BEGIN Variables */
-
-
+#include <string.h>
+#include "main.h"
 uint8_t FATFS_LinkDriver(Diskio_drvTypeDef *drv, char *path);
 
 /* USER CODE END Variables */
@@ -53,9 +53,6 @@ DWORD get_fattime(void)
 }
 
 /* USER CODE BEGIN Application */
-#include "main.h"
-//extern ST7735_ListBox_Item Files_on_SD[ITEM_ON_PAGE_MAX];
-
 
 uint8_t FS_GetFileList(typeEnv *Env)
 {
@@ -84,7 +81,7 @@ uint8_t FS_GetFileList(typeEnv *Env)
 		{   /* Это файл. Заносим название в список файлов */
 			if(cnt_file >= start_list && cnt_file < end_list)
 			{
-				strncpy( &(Env->Menu.FileList[indx][0]),  &fs_info.fname, strlen(fs_info.fname));
+				strncpy( &(Env->Menu.FileList[indx][0]),  fs_info.fname, strlen(fs_info.fname));
 				indx++;
 				Env->Menu.NmbrOnPageFiles=indx;
 			}
@@ -97,10 +94,129 @@ uint8_t FS_GetFileList(typeEnv *Env)
 	return 0;
 }
 
+
+
+uint8_t FS_Read_JSON_File(typeEnv *Env)
+{
+//	int sz =2000;
+//	char *FileName = (*Env).FileNameForTest;
+//	char *buf=0; // строка прочитанная из файла
+//	char str[200]={0};
+//	cJSON * jsonObj=0;
+////	cJSON * item = NULL;
+//	cJSON * LineNum=0;
+//	uint32_t byteRead=0;
+//	char *PrintString = 0;
+////	buf = (char*)malloc(sz);  // выделяем кусок памяти из кучи
+//	char *JsonBuf 		= (*Env).JsonBuf;
+//	FIL fs_file;
+//	FRESULT fs_result=0;
+////открываем файл
+//	fs_result = f_open(&fs_file, FileName, FA_READ);
+//	if(fs_result != FR_OK)	{ return 1; }
+//
+//// читаем весь файл в буфер
+//	fs_result = f_read(&fs_file, JsonBuf, FILE_SIZE, &byteRead);
+//	if(fs_result != FR_OK)	{ return 1; }
+//	f_close (&fs_file);
+//	(*Env).RealDataSize = byteRead;
+//// парсим буфер
+////		jsonObj = cJSON_ParseWithLength(JsonBuf, FILE_SIZE);
+//		jsonObj = cJSON_Parse(JsonBuf);
+//		PrintString = cJSON_Print(jsonObj);
+//		sprintf(str, PrintString);
+//				 const char *error_ptr = cJSON_GetErrorPtr();
+//				 if (error_ptr != NULL)
+//				 {
+//					 sprintf(str, error_ptr);
+////				 fprintf(stderr, "Ошибка до: %s\n", error_ptr);
+//				 }
+////		cJSON_bool typ 	=  cJSON_IsArray(jsonObj);
+////		typ				=  cJSON_IsObject(jsonObj);
+////		uint8_t arrSZ = cJSON_GetArraySize(jsonObj);
+//		/*cJSON * subitem = cJSON_GetArrayItem(item, i);
+//     name = cJSON_GetObjectItem(subitem, "name");
+//     index = cJSON_GetObjectItem(subitem, "index");
+//     optional = cJSON_GetObjectItem(subitem, "optional");*/
+//		cJSON * test = cJSON_GetObjectItem(jsonObj, "test");
+//		cJSON_bool typ 	=  cJSON_IsArray(test);
+//		if( test != 0)
+//		{
+//			for(uint8_t i=0; i<52; i++)
+//			{
+//				cJSON *item 	= cJSON_GetArrayItem(test, i);
+//				cJSON *cabel = cJSON_GetObjectItem(item, "cabel");
+//				cJSON *adapter = cJSON_GetObjectItem(item, "adapter");
+////				(*Env).Lines[i].adapter.begin.name = LineNum->valueint;
+//			}
+//		}
+/*
+  cJSON *item = cJSON_GetObjectItem(items,"items");
+  for (i = 0 ; i < cJSON_GetArraySize(item) ; i++)
+  {
+     cJSON * subitem = cJSON_GetArrayItem(item, i);
+     name = cJSON_GetObjectItem(subitem, "name");
+     index = cJSON_GetObjectItem(subitem, "index");
+     optional = cJSON_GetObjectItem(subitem, "optional");
+  }*/
+//			item = cJSON_GetObjectItem(result, "line");
+			//strncpy(str, cJSON_Print(result),sizeof(str));
+//			free(buf);
+
+//			return result;
+}
+
+
+
+
+/* *********************************************
+ *
+ * Чтение файла универсальной настройки
+ * вызывается в   Menu(typeEnv *Env)
+ *
+ ************************************ */
+uint8_t FS_ReadCSVFile(typeEnv *Env){
+	char *FileName = (*Env).FileNameForTest;
+	char *p_start=0;
+	char *p_end=0;
+	FIL fs_file;
+	FRESULT fs_result=0;
+	uint32_t byteRead=0;
+
+	fs_result = f_open(&fs_file, FileName, FA_READ);
+	if(fs_result != FR_OK)
+		{
+		memset((*Env).Status , 0, sizeof((*Env).Status ));
+		strcpy((*Env).Status , 'FS_ERR_OPEN_FILE');// конец файла
+		return 1;
+		}
+	// читаем всесь файл в буфер
+	fs_result = f_read(&fs_file, (*Env).CSVBuf, sizeof((*Env).CSVBuf), &byteRead);
+	f_close(&fs_file);
+	if(fs_result != FR_OK)
+		{
+		memset((*Env).Status , 0, sizeof((*Env).Status ));
+		strcpy((*Env).Status , 'FS_ERR_READ_FILE');
+		return 1;
+		}
+
+	if(byteRead !=FILE_SIZE)
+		{
+			(*Env).RealDataSize = byteRead;
+		}
+	else{
+		memset((*Env).Status , 0, sizeof((*Env).Status ));
+		strcpy((*Env).Status , 'FS_EOF');// конец файла
+	}
+	ParseCSVBuf(Env);
+}
+
+
+
 uint8_t FS_ReadFile(typeEnv *Env)
 {
 	char *FileName = (*Env).FileNameForTest;
-	//memset((*Env).DataForTest, 0, sizeof((*Env).DataForTest));
+
 	char X1[NLin*2]={0}, X2[NLin*2]={0};
 	char string[DATA_TEST_SIZE]={0}; // строка прочитанная из файла ; 255 байт
 	char FormatStr[5*NLin]={0};// 5 символов в строке форматирования "%d%*c" для одного значения
@@ -108,11 +224,11 @@ uint8_t FS_ReadFile(typeEnv *Env)
 	char *p_end=0;
 	int LenData=0, MaxLen=0;
 	uint32_t DataBuf[2][NLin]={0};
-	//uint32_t *DataBuf=(*Env).DataForTest;
+
 	FIL fs_file;
 	FRESULT fs_result=0;
 	uint32_t byteRead=0;
-	uint32_t ofs=0;	// смещение от начала файла
+
 	fs_result = f_open(&fs_file, FileName, FA_READ);
 		if(fs_result != FR_OK)	{ return 1; }
 // читаем всесь файл в буфер
@@ -121,14 +237,14 @@ uint8_t FS_ReadFile(typeEnv *Env)
 		(*Env).RealDataSize = byteRead;
 
 		// выделяем данные заключенные в скобки [] для разъёма X1
-		p_start = strchr(&string, PARS_START_DATA);
-		p_end = strchr(&string, PARS_END_DATA);
+		p_start = strchr(&string, (char)PARS_START_DATA);
+		p_end = strchr(&string, (char)PARS_END_DATA);
 		LenData = p_end - p_start;
 		MaxLen = LenData;
 		memmove(&X1, (p_start+1),  LenData-1);
 		for(uint8_t i=0; i<LenData/2;i++)
 		{
-			strcat( &FormatStr,  "%d%*c");
+			strcat( &FormatStr,  (const char)"%d%*c");
 
 		}
 		sscanf(&X1, &FormatStr,			&DataBuf[0][0], \
@@ -157,7 +273,9 @@ uint8_t FS_ReadFile(typeEnv *Env)
 
 		memset(FormatStr,0, sizeof(FormatStr));
 		for(uint8_t i=0; i<LenData/2;i++)
-				{			strcat( &FormatStr,  "%d%*c");				}
+		{
+			strcat( &FormatStr,  (const char)"%d%*c");
+		}
 
 		sscanf(&X2, &FormatStr, 	&DataBuf[1][0],  &DataBuf[1][1], \
 									&DataBuf[1][2],  &DataBuf[1][3],\

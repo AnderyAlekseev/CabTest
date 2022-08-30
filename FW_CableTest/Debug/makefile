@@ -58,8 +58,11 @@ all: main-build
 # Main-build Target
 main-build: FW_CableTest.elf secondary-outputs
 
+dependents:
+	-cd C:/Work/Freelanse/LKDS/CableTest/FW_CableTest/Release && $(MAKE) all
+
 # Tool invocations
-FW_CableTest.elf: $(OBJS) $(USER_OBJS) C:\Work\Freelanse\LKDS\CableTest\FW_CableTest\STM32F103C8TX_FLASH.ld
+FW_CableTest.elf: $(OBJS) $(USER_OBJS) C:/Work/Freelanse/LKDS/CableTest/FW_CableTest/Release/FW_CableTest.elf C:\Work\Freelanse\LKDS\CableTest\FW_CableTest\STM32F103C8TX_FLASH.ld
 	arm-none-eabi-gcc -o "FW_CableTest.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Work\Freelanse\LKDS\CableTest\FW_CableTest\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="FW_CableTest.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
@@ -95,5 +98,6 @@ warn-no-linker-script-specified:
 
 .PHONY: all clean dependents fail-specified-linker-script-missing warn-no-linker-script-specified
 .SECONDARY:
+C:/Work/Freelanse/LKDS/CableTest/FW_CableTest/Release/FW_CableTest.elf:
 
 -include ../makefile.targets
