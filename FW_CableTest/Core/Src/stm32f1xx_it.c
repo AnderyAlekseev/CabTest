@@ -267,6 +267,7 @@ void timer_1ms(void)
 	if (    (f_1ms = !f_1ms)==0        )
 	  {
 	   Flags_1ms();
+//	   lv_tick_inc(12);
 	  }
 }
 
@@ -290,6 +291,7 @@ void Flags_10msec()
 		{
 		  t_100ms = cl_ms100;
 		  Flags_100ms();
+
 		}
 }
 

@@ -17,12 +17,11 @@ uint8_t CheckConnect(typeEnv *Env);
 const uint16_t  COLORS565[140] = {0xF7DF, 0xFF5A, 0x07FF, 0x7FFA, 0xF7FF, 0xF7BB, 0xFF38, 0x0, 0xFF59, 0x001F, 0x895C, 0xA145, 0xDDD0, 0x5CF4, 0x7FE0, 0xD343, 0xFBEA, 0x64BD, 0xFFDB, 0xD8A7, 0x07FF, 0x11, 0x451, 0xBC21, 0xAD55, 0x320, 0xBDAD, 0x8811, 0x5345, 0xFC60, 0x9999, 0x8800, 0xECAF, 0x8DF1, 0x49F1, 0x2A69, 0x067A, 0x901A, 0xF8B2, 0x05FF, 0x6B4D, 0x1C9F, 0xB104, 0xFFDE, 0x2444, 0xF81F, 0xDEFB, 0xFFDF, 0xFEA0, 0xDD24, 0x8410, 0x400, 0xAFE5, 0xF7FE, 0xFB56, 0xCAEB, 0x4810, 0xFFFE, 0xF731, 0xE73F, 0xFF9E, 0x7FE0, 0xFFD9, 0xAEDC, 0xF410, 0xE7FF, 0xFFDA, 0xD69A, 0x9772, 0xFDB8, 0xFD0F, 0x2595, 0x867F, 0x7453, 0xB63B, 0xFFFC, 0x7, 0x3666, 0xFF9C, 0xF81F, 0x8000, 0x6675, 0x19, 0xBABA, 0x939B, 0x3D8E, 0x7B5D, 0x07D3, 0x4E99, 0xC0B0, 0x18CE, 0xF7FF, 0xFF3C, 0xFF36, 0xFEF5, 0x10, 0xFFBC, 0x8400, 0x6C64, 0xFD20, 0xFA20, 0xDB9A, 0xEF55, 0x9FD3, 0xAF7D, 0xDB92, 0xFF7A, 0xFED7, 0xCC27, 0xFE19, 0xDD1B, 0xB71C, 0x8010, 0xF800, 0xBC71, 0x435C, 0x8A22, 0xFC0E, 0xF52C, 0x2C4A, 0xFFBD, 0xA285, 0xC618, 0x867D, 0x6AD9, 0x7412, 0xFFDF, 0x07EF, 0x4416, 0xD5B1, 0x410, 0xDDFB, 0xFB08, 0x471A, 0xEC1D, 0xF6F6, 0xFFFF, 0xF7BE, 0xFFE0, 0x9E66 };
 
 
-
 void Menu(typeEnv *Env)
 {
 	uint32_t end_list = Env->Menu.NmbrOnPageFiles;
-	short int ActiveItem = (*Env).Menu.ActiveItem; // ActiveItem сделать указателем
-	short int ActivePage = (*Env).Menu.ActivePage; // ActivePage оставить переменной
+	short int ActiveItem = (*Env).Menu.ActiveItem;
+	short int ActivePage = (*Env).Menu.ActivePage;
 
 	if(f_StepMenu != 0) // если необходимо перемещение по меню
 	{
@@ -54,8 +53,7 @@ void Menu(typeEnv *Env)
 					FS_GetFileList(Env);			// получи новый список файлов
 					ST7735_Clear(BGR_COLOR);
 				}
-				//EncoderCount = currentCount;
-		(*Env).Menu.ActiveItem = ActiveItem;	// ActiveItem сделать указателем
+		(*Env).Menu.ActiveItem = ActiveItem;
 		(*Env).FileNameForTest = Env->Menu.FileList[ActiveItem];
 	}
 
@@ -63,8 +61,8 @@ void Menu(typeEnv *Env)
 	{
 		f_Action =0;
 
-		FS_ReadFile(Env);				// прочитать выделенный файл
-		(*Env).Mode = MODE_WAIT;		// перейти в режим проверки схемы соединений
+		FS_ReadCSVFile(Env);			// прочитать выделенный файл
+		(*Env).Mode = MODE_WAIT;		// перейти в режим проверки схемы соединений, ожидание подключения кабеля
 		f_RefreshScreen = 1;			// перерисуй экран
 	}
 }
@@ -76,7 +74,7 @@ void Wait(typeEnv *Env)
 	if(f_StepMenu != 0) 				// если вверх или вниз, направление не важно
 		{
 			f_StepMenu = 0;
-			(*Env).Mode = MODE_MENU;			// перейти в режим меню
+			(*Env).Mode = MODE_MENU;	// перейти в режим меню
 			ST7735_Clear(BGR_COLOR);
 			f_RefreshScreen = 1;		// перерисуй экран
 		}
@@ -85,8 +83,8 @@ void Wait(typeEnv *Env)
 	if(f_Action == 1 || f_connect ==1 )    	// если нажата ОК или подключен кабель
 		{
 			f_Action = 0;
-			(*Env).Mode = MODE_TEST;			// перейти в режим ТЕСТ
-			f_StartTest	= 1; 			// запустить тест сразу при переходе в состояние ТЕСТ
+			(*Env).Mode = MODE_TEST;		// перейти в режим ТЕСТ
+			f_StartTest	= 1; 				// запустить тест сразу при переходе в состояние ТЕСТ
 		}
 
 }
@@ -106,15 +104,16 @@ void Result(typeEnv *Env)
 		}
 }
 
-/* Чтение состояние кнопок и энкодера*/
+/* Чтение состояние кнопок*/
 void ReadKeyPad(void)
 {
 	static uint16_t LastEncCount=0;
-	uint16_t CurrEncCount=LL_TIM_GetCounter(TIM3);
 	static uint8_t but_latch=0, but_press=0, key=0;
+
+	uint16_t CurrEncCount=LL_TIM_GetCounter(TIM3);
 	uint8_t but_OK=0, but_DWN=0, but_UP=0, but_ENC=0;
 
-	if(f_ReadKeyPad !=0)	// по таймеру
+	if(f_ReadKeyPad !=0)						// по таймеру
 	{
 		f_ReadKeyPad =0;
 		but_ENC = LL_GPIO_IsInputPinSet(BUTTON_GPIO_Port, BUTTON_Pin)<<3;
@@ -130,16 +129,11 @@ void ReadKeyPad(void)
 		}
 		else if( but_latch==0xF &&  but_press == 1)
 		{
-			Keyboard_handler(key);		// обработка нажатия после отпускания
+			Keyboard_handler(key);				// обработка нажатия после отпускания
 			but_press=0;
 			key=0;
 
 		}
-//		else if(CurrEncCount != LastEncCount)
-//		{
-//			Encoder_handler(LastEncCount, CurrEncCount );		// обработка поворота энкодера
-//			LastEncCount = CurrEncCount;
-//		}
 	}
 }
 

@@ -20,14 +20,13 @@ void Test(typeEnv *Env)
 		{
 			f_StepMenu = 0;
 			(*Env).Mode = MODE_WAIT;
-			f_RefreshScreen = 1;				// перерисуй экран
+			f_RefreshScreen = 1;			// перерисуй экран
 		}
-	if(f_Action == 1)    // если нужно действие
+	if(f_Action == 1)   					// если нужно действие
 		{
 			f_Action =0;
-			f_StartTest	= 1;// запустить тест
+			f_StartTest	= 1;				// запустить тест
 		}
-
 
 	if(f_StartTest	== 1)
 	{
@@ -55,16 +54,12 @@ void TestProsed(typeEnv *Env)
 	uint32_t check=0, index=0;
 	uint32_t size=0; // количество соединённых линий, определённое в результате теста
 
-//	Init_Output_Input_Alter();
-
 	LL_TIM_EnableIT_CC1(TIM2); // назначить прерывание по захвату принятого сигнала
 
-	//LL_TIM_EnableCounter(TIM1);// генерация тестового сигнала
 	LL_TIM_ClearFlag_UPDATE(TIM4);
 	memset(X1, 0, sizeof(X1));
 	memset(X2, 0, sizeof(X2));
 	f_failtest=0;
-//	memset((*Env).CheckLine, 0 ,sizeof((*Env).CheckLine));
 
 //	разворачиваем разреженую матрицу из конфиг файла в обычную X1
 	for( index=0; index<NCheckLine; index++)
@@ -81,30 +76,30 @@ void TestProsed(typeEnv *Env)
 // процедура теста заполняем матрицу X2
 			for( out_addr=0; out_addr<NCheckLine; out_addr++)
 			{
-				MuxSetOUT_Addr(out_addr);	// установить номер выхода X1
-				GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
+				MuxSetOUT_Addr(out_addr);					// установить номер вЫхода X1
+				GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);	// включить мультиплексор выходной
 				for( in_addr=0; in_addr<NCheckLine; in_addr++)
 				{
-					MuxSetIN_Addr(in_addr);	// установить номер входа X2
-					GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
+					MuxSetIN_Addr(in_addr);					// установить номер входа X2
+					GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);	// включить мультиплексор входной
 
-					LL_TIM_EnableCounter(TIM2);// включить захват принятого сигнала
+					LL_TIM_EnableCounter(TIM2);				// включить захват принятого сигнала
 					N_periods=0;
-					LL_TIM_EnableCounter(TIM4);	// триггер для запуска тестового сигнала
+					LL_TIM_EnableCounter(TIM4);				// триггер для запуска тестового сигнала
 
 					while( !LL_TIM_IsActiveFlag_UPDATE(TIM4)){}
-					LL_TIM_DisableCounter(TIM4);// вЫключить триггер для запуска тестового сигнала
+					LL_TIM_DisableCounter(TIM4);			// вЫключить триггер для запуска тестового сигнала
 					LL_TIM_ClearFlag_UPDATE(TIM4);
-					LL_TIM_DisableCounter(TIM2);// вЫключить захват принятого сигнала
+					LL_TIM_DisableCounter(TIM2);			// вЫключить захват принятого сигнала
 
-					GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
+					GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);	// вЫключить мультиплексор входной
 					if( N_periods == 10)
 					{
-						X2[out_addr][in_addr]=1; // есть контакт
+						X2[out_addr][in_addr]=1; 			// есть контакт
 						size++;
 					}
 				}
-				GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
+				GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);		// вЫключить мультиплексор выходной
 			}
 			LL_TIM_DisableIT_CC1(TIM2);
 // X2 заполнили
@@ -142,6 +137,7 @@ void TestProsed(typeEnv *Env)
 								(*Env).DataForTest[1][index] == DataAfterTest[1][index])
 					{
 						(*Env).CheckLine[index]=1;
+
 					}
 					else
 					{
@@ -153,12 +149,12 @@ void TestProsed(typeEnv *Env)
 			if(f_failtest == 1)
 			{
 				f_failtest=0;
+				sprintf((*Env).Status,"%s","FAIL");
 				Sound(4000);
 			}else{
+				sprintf((*Env).Status,"%s","OK");
 				Sound(250);
 			}
-//Init_Output_Input_GPIO();
-
 }
 
 
@@ -239,20 +235,12 @@ uint8_t CheckConnect(typeEnv *Env)
 	for( out_addr=0; out_addr<NCheckLine; out_addr++)
 	{
 		MuxSetOUT_Addr(out_addr);	// установить номер выхода X1
-//		GPIO_WriteBit(GPIOB, OUT_EN_Pin, RESET);// включить мультиплексор выходной
 		for( in_addr=0; in_addr<NCheckLine; in_addr++)
 		{
-
 			MuxSetIN_Addr(in_addr);	// установить номер входа X2
-//			GPIO_WriteBit(GPIOA, IN_EN_Pin, RESET);// включить мультиплексор входной
-
-
 			HAL_Delay(1);
 			connect += LL_GPIO_IsInputPinSet(GPIOA, LL_GPIO_PIN_0); //считать in
-
-//			GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
 		}
-//		GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной
 	}
 	GPIO_WriteBit(GPIOA, IN_EN_Pin, SET);// вЫключить мультиплексор входной
 	GPIO_WriteBit(GPIOB, OUT_EN_Pin, SET);// вЫключить мультиплексор выходной

@@ -83,6 +83,8 @@ void DisplayTest(typeEnv *Env)
 		DrawTable(Env);
 		uint8_t Message[22]={"Press OK for run test"};
 		ST7735_DrawString(Mx,My,Message,TXT_COLOR,BGR_COLOR);
+
+		ST7735_DrawString(Mx,6,(*Env).Status,TXT_COLOR,BGR_COLOR);
 	}
 }
 

@@ -2,7 +2,8 @@
 
 # dependencies
 /datasheet
-
+/PCB
+/договор
 # testing
 #/coverage
 

@@ -30,12 +30,14 @@
 #include "font5x7.h"
 #include "font7x11.h"
 #include "color565.h"
+
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-typeEnv Env;
-uint32_t FLAG;
+typeEnv Env={0};
+uint32_t FLAG=0;
 uint32_t count_tic = 0; // счётчик тиков для подсчёта времени выполнения кода
 /* USER CODE END PTD */
 
@@ -63,7 +65,10 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-
+/************************************************	LVGL	**********************************/
+//	  lv_disp_draw_buf_t  lvgl_disp_buf;
+//	  lv_color_t  buf_1[MY_DISP_HOR_RES * 10];
+/************************************************************************************************
 /* USER CODE END 0 */
 
 /**
@@ -73,10 +78,10 @@ void SystemClock_Config(void);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	FATFS	FatFs; 	//Fatfs handle
+	FATFS	FatFs;
 	FRESULT resFS;
-	char status[20] = "123456";
-//	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;//   / - \ |
+	char status[20] = {0};
+	uint8_t waitCHR[4]= {0x7C, 0x2F, 0x2D, 0x5C}, w_indx=0;//   / - \ | - в режиме ожидания крутим спинер из этих символов
 	Env.Menu.ActiveItem=0;
 	Env.Menu.ActivePage=0;
 	Env.period=0;
@@ -84,6 +89,9 @@ int main(void)
 	Env.Mode = MODE_MENU;
 	uint8_t mode = Env.Mode;
 	f_RefreshScreen = 1;
+
+	LineStructInit(&Env);
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -93,7 +101,7 @@ int main(void)
 
   /* USER CODE BEGIN Init */
   /*++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
-  		  SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;// разрешаем использовать DWT // измерение времени выполнения куска кода в машинных тиках
+  		  SCB_DEMCR |= CoreDebug_DEMCR_TRCENA_Msk;// разрешаем использовать DWT
   		  DWT_CYCCNT = 0;// обнуляем значение
   		  DWT_CONTROL|= DWT_CTRL_CYCCNTENA_Msk; // включаем счётчик
   		/*+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++*/
@@ -122,61 +130,50 @@ int main(void)
 	LL_TIM_CC_EnableChannel(TIM4, LL_TIM_CHANNEL_CH2);
 	LL_TIM_EnableCounter(TIM1);
 
-//	LL_TIM_EnableCounter(TIM3);
-//	HAL_Delay(500);
-//	LL_TIM_DisableCounter(TIM3);
-
 	LL_SPI_Enable(SPI1);// включить SPI после инициализации ДО иниц. FATFS
 	resFS = f_mount(&FatFs, "", 1); //Монтируем файловую систему до первого использования SPI дисплеем
 
 	HAL_ST7735_Init();
 
 	if(resFS != FR_OK)
-				{
-				ST7735_Clear(DANGER_BGR_COLOR);
-				sprintf(status, "SD card" );
-				ST7735_DrawString7x11(39,1, status,DANGER_TXT_COLOR,DANGER_BGR_COLOR);
-				sprintf(status, "not find" );
-				ST7735_DrawString7x11(27,LINE_HEIGTH*1, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
-				sprintf(status, "Insert SD card" );
-				ST7735_DrawString7x11(8,LINE_HEIGTH*2, status, DANGER_TXT_COLOR, DANGER_BGR_COLOR);
-				sprintf(status, "and reboot" );
-				ST7735_DrawString7x11(29,LINE_HEIGTH*3, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
-				sprintf(status, "device" );
-				ST7735_DrawString7x11(42,LINE_HEIGTH*4, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
-				while( 1);
-				}
-
-
+	{
+		ST7735_Clear(DANGER_BGR_COLOR);
+		sprintf(status, "SD card" );
+		ST7735_DrawString7x11(39,1, status,DANGER_TXT_COLOR,DANGER_BGR_COLOR);
+		sprintf(status, "not find" );
+		ST7735_DrawString7x11(27,LINE_HEIGTH*1, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+		sprintf(status, "Insert SD card" );
+		ST7735_DrawString7x11(8,LINE_HEIGTH*2, status, DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+		sprintf(status, "and reboot" );
+		ST7735_DrawString7x11(29,LINE_HEIGTH*3, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+		sprintf(status, "device" );
+		ST7735_DrawString7x11(42,LINE_HEIGTH*4, status,DANGER_TXT_COLOR, DANGER_BGR_COLOR);
+		while( 1);
+	}
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-	ST7735_Clear(BGR_COLOR);
-	HAL_Delay(100);
-	FS_GetFileList( &Env);
-	Env.Menu.NmbrAllPages = (uint32_t)(Env.Menu.NmbrAllFiles/ITEM_ON_PAGE_MAX);
-    Env.FileNameForTest = Env.Menu.FileList[0];
-	// Init_Output_Input_GPIO();
-/* PB4 - выход на зуммер*/
+		ST7735_Clear(BGR_COLOR);
+		FS_GetFileList( &Env);
+		Env.Menu.NmbrAllPages = (uint32_t)(Env.Menu.NmbrAllFiles/ITEM_ON_PAGE_MAX);
+		Env.FileNameForTest = Env.Menu.FileList[0];
   while (1)
   {
-	 DWT_CYCCNT = 0;// обнуляем значение
 	f_connect = CheckConnect(Env);
 	count_tic = DWT_CYCCNT;//смотрим сколько натикало
 	ReadKeyPad();
 	mode = Env.Mode;
 	switch(mode)	// назначить действие в зависимости от текущего режима
-			{
-				case MODE_MENU: 	Menu(&Env); 	break;
-				case MODE_WAIT: 	Wait(&Env);  	break;
-				case MODE_TEST: 	Test(&Env);		break;
-				default: break;
-			}
+	{
+		case MODE_MENU: 	Menu(&Env); 	break;
+		case MODE_WAIT: 	Wait(&Env);  	break;
+		case MODE_TEST: 	Test(&Env);		break;
+		default: break;
+	}
 	Display(&Env);
-
-	  //HAL_Delay(200);
+    HAL_Delay(100);
 
     /* USER CODE END WHILE */
 

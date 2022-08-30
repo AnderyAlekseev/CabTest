@@ -18,7 +18,7 @@ stm32f1xx_it.c:214:6:TIM1_TRG_COM_IRQHandler	8	static
 stm32f1xx_it.c:230:6:TIM2_IRQHandler	8	static
 stm32f1xx_it.c:251:6:TIM4_IRQHandler	8	static
 stm32f1xx_it.c:265:6:timer_1ms	8	static
-stm32f1xx_it.c:273:6:Flags_1ms	8	static
-stm32f1xx_it.c:285:6:Flags_10msec	8	static
-stm32f1xx_it.c:296:6:Flags_100ms	8	static
-stm32f1xx_it.c:318:6:Flags_1s	4	static
+stm32f1xx_it.c:274:6:Flags_1ms	8	static
+stm32f1xx_it.c:286:6:Flags_10msec	8	static
+stm32f1xx_it.c:298:6:Flags_100ms	8	static
+stm32f1xx_it.c:320:6:Flags_1s	4	static

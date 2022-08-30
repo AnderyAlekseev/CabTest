@@ -2291,7 +2291,7 @@ FRESULT find_volume (	/* FR_OK(0): successful, !=0: any error occurred */
 	/* Get logical drive number from the path name */
 	*rfs = 0;
 	vol = get_ldnumber(path);
-	if (vol < 0) return FR_INVALID_DRIVE;
+	if (vol < 0) return FR_INVALID_DRIVE;//vol=0
 
 	/* Check if the file system object is valid or not */
 	fs = FatFs[vol];					/* Get pointer to the file system object */
